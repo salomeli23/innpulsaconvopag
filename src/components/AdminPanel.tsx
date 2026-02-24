@@ -110,6 +110,19 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    if (termFiles.length >= 15) {
+      alert('Máximo 15 archivos de términos de referencia permitidos');
+      e.target.value = '';
+      return;
+    }
+
+    const remainingSlots = 15 - termFiles.length;
+    if (files.length > remainingSlots) {
+      alert(`Solo puedes agregar ${remainingSlots} archivo(s) más. Máximo 15 archivos en total.`);
+      e.target.value = '';
+      return;
+    }
+
     setUploadingFile(true);
 
     try {
@@ -394,7 +407,13 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   </label>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors">
+                      <label
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                          termFiles.length >= 15
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                        }`}
+                      >
                         <Upload size={16} />
                         {uploadingFile ? 'Subiendo...' : 'Adjuntar PDF'}
                         <input
@@ -402,13 +421,13 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                           accept="application/pdf"
                           multiple
                           onChange={handleFileUpload}
-                          disabled={uploadingFile}
+                          disabled={uploadingFile || termFiles.length >= 15}
                           className="hidden"
                         />
                       </label>
-                      <span className="text-sm text-gray-500">
-                        Puedes subir múltiples archivos PDF
-                      </span>
+                      <div className="text-sm text-gray-500">
+                        <p>Máximo 15 archivos PDF ({termFiles.length}/15)</p>
+                      </div>
                     </div>
 
                     {termFiles.length > 0 && (
