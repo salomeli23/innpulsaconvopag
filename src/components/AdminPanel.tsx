@@ -106,19 +106,14 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setShowForm(true);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, slotIndex: number) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    if (termFiles.length >= 15) {
-      alert('Máximo 15 archivos de términos de referencia permitidos');
-      e.target.value = '';
-      return;
-    }
+    const file = files[0];
 
-    const remainingSlots = 15 - termFiles.length;
-    if (files.length > remainingSlots) {
-      alert(`Solo puedes agregar ${remainingSlots} archivo(s) más. Máximo 15 archivos en total.`);
+    if (file.type !== 'application/pdf') {
+      alert('Solo se permiten archivos PDF');
       e.target.value = '';
       return;
     }
@@ -126,59 +121,50 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setUploadingFile(true);
 
     try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
 
-        if (file.type !== 'application/pdf') {
-          alert('Solo se permiten archivos PDF');
-          continue;
-        }
+      await new Promise((resolve) => {
+        reader.onload = async () => {
+          const base64 = reader.result as string;
 
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-
-        await new Promise((resolve) => {
-          reader.onload = async () => {
-            const base64 = reader.result as string;
-
-            const newTerm: Partial<ConvocatoriaTerm> = {
-              convocatoria_id: editingId || '',
-              file_name: file.name,
-              file_url: base64,
-              file_size: file.size,
-            };
-
-            if (editingId) {
-              const { error } = await supabase
-                .from('convocatoria_terms')
-                .insert([newTerm]);
-
-              if (!error) {
-                const { data: terms } = await supabase
-                  .from('convocatoria_terms')
-                  .select('*')
-                  .eq('convocatoria_id', editingId)
-                  .order('created_at', { ascending: false });
-
-                if (terms) {
-                  setTermFiles(terms);
-                }
-              }
-            } else {
-              setTermFiles([...termFiles, { ...newTerm, id: `temp-${Date.now()}`, uploaded_at: new Date().toISOString(), created_at: new Date().toISOString() } as ConvocatoriaTerm]);
-            }
-
-            resolve(null);
+          const newTerm: Partial<ConvocatoriaTerm> = {
+            convocatoria_id: editingId || '',
+            file_name: file.name,
+            file_url: base64,
+            file_size: file.size,
           };
-        });
-      }
+
+          if (editingId) {
+            const { error } = await supabase
+              .from('convocatoria_terms')
+              .insert([newTerm]);
+
+            if (!error) {
+              const { data: terms } = await supabase
+                .from('convocatoria_terms')
+                .select('*')
+                .eq('convocatoria_id', editingId)
+                .order('created_at', { ascending: true });
+
+              if (terms) {
+                setTermFiles(terms);
+              }
+            }
+          } else {
+            setTermFiles([...termFiles, { ...newTerm, id: `temp-${Date.now()}`, uploaded_at: new Date().toISOString(), created_at: new Date().toISOString() } as ConvocatoriaTerm]);
+          }
+
+          resolve(null);
+        };
+      });
     } finally {
       setUploadingFile(false);
       e.target.value = '';
     }
   };
 
-  const handleDeleteTermFile = async (termId: string) => {
+  const handleDeleteTermFile = async (termId: string, slotIndex: number) => {
     if (termId.startsWith('temp-')) {
       setTermFiles(termFiles.filter(t => t.id !== termId));
     } else {
@@ -403,58 +389,66 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Archivos de Términos de Referencia (PDF)
+                    Archivos de Términos de Referencia (PDF) - Máximo 15
                   </label>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <label
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                          termFiles.length >= 15
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                        }`}
-                      >
-                        <Upload size={16} />
-                        {uploadingFile ? 'Subiendo...' : 'Adjuntar PDF'}
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          multiple
-                          onChange={handleFileUpload}
-                          disabled={uploadingFile || termFiles.length >= 15}
-                          className="hidden"
-                        />
-                      </label>
-                      <div className="text-sm text-gray-500">
-                        <p>Máximo 15 archivos PDF ({termFiles.length}/15)</p>
-                      </div>
-                    </div>
+                  <div className="space-y-2">
+                    {Array.from({ length: 15 }).map((_, index) => {
+                      const existingFile = termFiles[index];
+                      const isEnabled = index === 0 || termFiles[index - 1] !== undefined;
 
-                    {termFiles.length > 0 && (
-                      <div className="space-y-2">
-                        {termFiles.map((term) => (
-                          <div
-                            key={term.id}
-                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                          >
-                            <div className="flex items-center gap-2">
-                              <File size={16} className="text-red-600" />
-                              <span className="text-sm text-gray-700">{term.file_name}</span>
-                              <span className="text-xs text-gray-500">
-                                ({(term.file_size / 1024).toFixed(1)} KB)
-                              </span>
-                            </div>
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            <span className="text-sm font-medium text-gray-600 w-8">
+                              {index + 1}.
+                            </span>
+
+                            {existingFile ? (
+                              <div className="flex items-center gap-2 flex-1">
+                                <File size={16} className="text-red-600" />
+                                <span className="text-sm text-gray-700">{existingFile.file_name}</span>
+                                <span className="text-xs text-gray-500">
+                                  ({(existingFile.file_size / 1024).toFixed(1)} KB)
+                                </span>
+                              </div>
+                            ) : (
+                              <label
+                                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-colors text-sm ${
+                                  !isEnabled
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                    : uploadingFile
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                                }`}
+                              >
+                                <Upload size={14} />
+                                {uploadingFile ? 'Subiendo...' : 'Adjuntar PDF'}
+                                <input
+                                  type="file"
+                                  accept="application/pdf"
+                                  onChange={(e) => handleFileUpload(e, index)}
+                                  disabled={!isEnabled || uploadingFile}
+                                  className="hidden"
+                                />
+                              </label>
+                            )}
+                          </div>
+
+                          {existingFile && (
                             <button
                               type="button"
-                              onClick={() => handleDeleteTermFile(term.id)}
-                              className="text-red-600 hover:text-red-800"
+                              onClick={() => handleDeleteTermFile(existingFile.id, index)}
+                              className="text-red-600 hover:text-red-800 ml-2"
                             >
                               <Trash2 size={16} />
                             </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
