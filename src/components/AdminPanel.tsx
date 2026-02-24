@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Convocatoria } from '../types';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Convocatoria, ConvocatoriaTerm } from '../types';
+import { Plus, Edit, Trash2, X, Upload, File } from 'lucide-react';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -11,6 +11,8 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [termFiles, setTermFiles] = useState<ConvocatoriaTerm[]>([]);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [formData, setFormData] = useState<Partial<Convocatoria>>({
     title: '',
     description: '',
@@ -60,21 +62,122 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
         resetForm();
       }
     } else {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('convocatorias')
-        .insert([formData]);
+        .insert([formData])
+        .select()
+        .single();
 
-      if (!error) {
+      if (!error && data) {
+        const tempTerms = termFiles.filter(t => t.id.startsWith('temp-'));
+        if (tempTerms.length > 0) {
+          const termsToInsert = tempTerms.map(t => ({
+            convocatoria_id: data.id,
+            file_name: t.file_name,
+            file_url: t.file_url,
+            file_size: t.file_size,
+          }));
+
+          await supabase
+            .from('convocatoria_terms')
+            .insert(termsToInsert);
+        }
+
         fetchConvocatorias();
         resetForm();
       }
     }
   };
 
-  const handleEdit = (convocatoria: Convocatoria) => {
+  const handleEdit = async (convocatoria: Convocatoria) => {
     setEditingId(convocatoria.id);
     setFormData(convocatoria);
+
+    const { data: terms } = await supabase
+      .from('convocatoria_terms')
+      .select('*')
+      .eq('convocatoria_id', convocatoria.id)
+      .order('created_at', { ascending: false });
+
+    if (terms) {
+      setTermFiles(terms);
+    }
+
     setShowForm(true);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingFile(true);
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+
+        if (file.type !== 'application/pdf') {
+          alert('Solo se permiten archivos PDF');
+          continue;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        await new Promise((resolve) => {
+          reader.onload = async () => {
+            const base64 = reader.result as string;
+
+            const newTerm: Partial<ConvocatoriaTerm> = {
+              convocatoria_id: editingId || '',
+              file_name: file.name,
+              file_url: base64,
+              file_size: file.size,
+            };
+
+            if (editingId) {
+              const { error } = await supabase
+                .from('convocatoria_terms')
+                .insert([newTerm]);
+
+              if (!error) {
+                const { data: terms } = await supabase
+                  .from('convocatoria_terms')
+                  .select('*')
+                  .eq('convocatoria_id', editingId)
+                  .order('created_at', { ascending: false });
+
+                if (terms) {
+                  setTermFiles(terms);
+                }
+              }
+            } else {
+              setTermFiles([...termFiles, { ...newTerm, id: `temp-${Date.now()}`, uploaded_at: new Date().toISOString(), created_at: new Date().toISOString() } as ConvocatoriaTerm]);
+            }
+
+            resolve(null);
+          };
+        });
+      }
+    } finally {
+      setUploadingFile(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleDeleteTermFile = async (termId: string) => {
+    if (termId.startsWith('temp-')) {
+      setTermFiles(termFiles.filter(t => t.id !== termId));
+    } else {
+      const { error } = await supabase
+        .from('convocatoria_terms')
+        .delete()
+        .eq('id', termId);
+
+      if (!error) {
+        setTermFiles(termFiles.filter(t => t.id !== termId));
+      }
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -108,6 +211,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       terms_url: '',
     });
     setEditingId(null);
+    setTermFiles([]);
     setShowForm(false);
   };
 
@@ -272,7 +376,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      URL de Términos
+                      URL de Términos (legacy)
                     </label>
                     <input
                       type="text"
@@ -281,6 +385,57 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       onChange={(e) => setFormData({ ...formData, terms_url: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Archivos de Términos de Referencia (PDF)
+                  </label>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors">
+                        <Upload size={16} />
+                        {uploadingFile ? 'Subiendo...' : 'Adjuntar PDF'}
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          multiple
+                          onChange={handleFileUpload}
+                          disabled={uploadingFile}
+                          className="hidden"
+                        />
+                      </label>
+                      <span className="text-sm text-gray-500">
+                        Puedes subir múltiples archivos PDF
+                      </span>
+                    </div>
+
+                    {termFiles.length > 0 && (
+                      <div className="space-y-2">
+                        {termFiles.map((term) => (
+                          <div
+                            key={term.id}
+                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                          >
+                            <div className="flex items-center gap-2">
+                              <File size={16} className="text-red-600" />
+                              <span className="text-sm text-gray-700">{term.file_name}</span>
+                              <span className="text-xs text-gray-500">
+                                ({(term.file_size / 1024).toFixed(1)} KB)
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteTermFile(term.id)}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 

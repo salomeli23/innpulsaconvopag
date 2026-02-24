@@ -1,3 +1,13 @@
+export interface ConvocatoriaTerm {
+  id: string;
+  convocatoria_id: string;
+  file_name: string;
+  file_url: string;
+  file_size: number;
+  uploaded_at: string;
+  created_at: string;
+}
+
 export interface Convocatoria {
   id: string;
   title: string;
@@ -16,6 +26,7 @@ export interface Convocatoria {
   purpose?: string;
   benefits?: string;
   terms_url?: string;
+  terms?: ConvocatoriaTerm[];
 }
 
 export type FilterStatus = 'todas' | 'abierta' | 'cerrada' | 'por-cerrar';

@@ -166,24 +166,49 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
             </div>
           )}
 
-          {convocatoria.terms_url && (
+          {(convocatoria.terms_url || (convocatoria.terms && convocatoria.terms.length > 0)) && (
             <div className="pt-8">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
                   <FileText className="text-[#002F87]" size={32} />
                 </div>
-                <div>
-                  <h3 className="text-[#002F87] font-bold text-xl mb-2">
+                <div className="flex-1">
+                  <h3 className="text-[#002F87] font-bold text-xl mb-3">
                     Términos de referencia y/o proceso de selección
                   </h3>
-                  <a
-                    href={convocatoria.terms_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 underline text-sm font-medium"
-                  >
-                    Descargar documento
-                  </a>
+
+                  {convocatoria.terms_url && (
+                    <div className="mb-3">
+                      <a
+                        href={convocatoria.terms_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline text-sm font-medium"
+                      >
+                        Descargar documento (legacy)
+                      </a>
+                    </div>
+                  )}
+
+                  {convocatoria.terms && convocatoria.terms.length > 0 && (
+                    <div className="space-y-2">
+                      {convocatoria.terms.map((term) => (
+                        <div key={term.id} className="flex items-center gap-2">
+                          <FileText className="text-red-600" size={16} />
+                          <a
+                            href={term.file_url}
+                            download={term.file_name}
+                            className="text-blue-600 hover:text-blue-800 underline text-sm font-medium"
+                          >
+                            {term.file_name}
+                          </a>
+                          <span className="text-xs text-gray-500">
+                            ({(term.file_size / 1024).toFixed(1)} KB)
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

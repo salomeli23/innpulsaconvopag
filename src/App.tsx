@@ -44,13 +44,25 @@ function App() {
 
   async function fetchConvocatorias() {
     try {
-      const { data, error } = await supabase
+      const { data: convocatoriasData, error: convError } = await supabase
         .from('convocatorias')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setConvocatorias(data || []);
+      if (convError) throw convError;
+
+      const { data: termsData, error: termsError } = await supabase
+        .from('convocatoria_terms')
+        .select('*');
+
+      if (termsError) throw termsError;
+
+      const convocatoriasWithTerms = (convocatoriasData || []).map(conv => ({
+        ...conv,
+        terms: (termsData || []).filter(term => term.convocatoria_id === conv.id)
+      }));
+
+      setConvocatorias(convocatoriasWithTerms);
     } catch (error) {
       console.error('Error fetching convocatorias:', error);
     } finally {
