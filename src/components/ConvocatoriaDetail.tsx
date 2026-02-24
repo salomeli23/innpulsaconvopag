@@ -47,7 +47,7 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
             <span className="text-gray-700">Todas</span>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-8 mb-8">
             <div className="lg:w-[45%]">
               <img
                 src={convocatoria.image_url}
@@ -56,53 +56,59 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
               />
             </div>
 
-            <div className="lg:w-[55%] bg-gray-50 rounded p-6 space-y-5">
-              <div>
-                <h3 className="text-[#002F87] font-bold text-base mb-3">Fecha de inicio:</h3>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[#FF8C00] rounded flex items-center justify-center flex-shrink-0">
-                    <Calendar className="text-white" size={20} />
+            <div className="lg:w-[55%] space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-[#002F87] font-bold text-base mb-3">Fecha de inicio:</h3>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-[#FF8C00] rounded flex items-center justify-center flex-shrink-0">
+                      <Calendar className="text-white" size={20} />
+                    </div>
+                    <span className="text-gray-800 text-sm">{formatDate(convocatoria.start_date)}</span>
                   </div>
-                  <span className="text-gray-800 text-sm">{formatDate(convocatoria.start_date)}</span>
+                </div>
+
+                <div>
+                  <h3 className="text-[#002F87] font-bold text-base mb-3">Fecha de cierre:</h3>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-[#FF8C00] rounded flex items-center justify-center flex-shrink-0">
+                      <Calendar className="text-white" size={20} />
+                    </div>
+                    <span className="text-gray-800 text-sm">{formatDate(convocatoria.end_date)}</span>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-[#002F87] font-bold text-base mb-3">Fecha de cierre:</h3>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[#FF8C00] rounded flex items-center justify-center flex-shrink-0">
-                    <Calendar className="text-white" size={20} />
-                  </div>
-                  <span className="text-gray-800 text-sm">{formatDate(convocatoria.end_date)}</span>
-                </div>
-              </div>
-
-              {convocatoria.start_time && (
-                <div>
-                  <h3 className="text-[#002F87] font-bold text-base mb-3">Hora de inicio:</h3>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-[#FF8C00] rounded flex items-center justify-center flex-shrink-0">
-                      <Clock className="text-white" size={20} />
+              {(convocatoria.start_time || convocatoria.end_time) && (
+                <div className="grid grid-cols-2 gap-6">
+                  {convocatoria.start_time && (
+                    <div>
+                      <h3 className="text-[#002F87] font-bold text-base mb-3">Hora de inicio:</h3>
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-[#FF8C00] rounded flex items-center justify-center flex-shrink-0">
+                          <Clock className="text-white" size={20} />
+                        </div>
+                        <span className="text-gray-800 text-sm">{convocatoria.start_time}</span>
+                      </div>
                     </div>
-                    <span className="text-gray-800 text-sm">{convocatoria.start_time}</span>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {convocatoria.end_time && (
-                <div>
-                  <h3 className="text-[#002F87] font-bold text-base mb-3">Hora de cierre:</h3>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-[#FF8C00] rounded flex items-center justify-center flex-shrink-0">
-                      <Clock className="text-white" size={20} />
+                  {convocatoria.end_time && (
+                    <div>
+                      <h3 className="text-[#002F87] font-bold text-base mb-3">Hora de cierre:</h3>
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-[#FF8C00] rounded flex items-center justify-center flex-shrink-0">
+                          <Clock className="text-white" size={20} />
+                        </div>
+                        <span className="text-gray-800 text-sm">{convocatoria.end_time}</span>
+                      </div>
                     </div>
-                    <span className="text-gray-800 text-sm">{convocatoria.end_time}</span>
-                  </div>
+                  )}
                 </div>
               )}
 
               {convocatoria.registration_url && convocatoria.status === 'abierta' && (
-                <div className="pt-2">
+                <div className="flex justify-center pt-2">
                   <a
                     href={convocatoria.registration_url}
                     target="_blank"
@@ -122,50 +128,52 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
           </div>
 
           {(convocatoria.target_audience || convocatoria.purpose || convocatoria.benefits) && (
-            <div className="grid md:grid-cols-3 gap-5 mb-10">
-              {convocatoria.target_audience && (
-                <div className="bg-gray-50 rounded p-5">
-                  <h3 className="text-[#002F87] font-bold text-base mb-3">
-                    ¿Para quién fue creada?
-                  </h3>
-                  <p className="text-gray-700 text-sm leading-relaxed">
-                    {convocatoria.target_audience}
-                  </p>
-                </div>
-              )}
+            <div className="bg-[#E8F4F8] rounded-lg p-8 mb-10">
+              <div className="grid md:grid-cols-3 gap-8">
+                {convocatoria.target_audience && (
+                  <div>
+                    <h3 className="text-[#002F87] font-bold text-base mb-4">
+                      ¿Para quién fue creada?
+                    </h3>
+                    <p className="text-gray-800 text-sm leading-relaxed">
+                      {convocatoria.target_audience}
+                    </p>
+                  </div>
+                )}
 
-              {convocatoria.purpose && (
-                <div className="bg-gray-50 rounded p-5">
-                  <h3 className="text-[#002F87] font-bold text-base mb-3">
-                    ¿Para qué fue creada?
-                  </h3>
-                  <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
-                    {convocatoria.purpose}
-                  </p>
-                </div>
-              )}
+                {convocatoria.purpose && (
+                  <div>
+                    <h3 className="text-[#002F87] font-bold text-base mb-4">
+                      ¿Para qué fue creada?
+                    </h3>
+                    <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-line">
+                      {convocatoria.purpose}
+                    </p>
+                  </div>
+                )}
 
-              {convocatoria.benefits && (
-                <div className="bg-gray-50 rounded p-5">
-                  <h3 className="text-[#002F87] font-bold text-base mb-3">
-                    ¿Qué beneficios ofrece?
-                  </h3>
-                  <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
-                    {convocatoria.benefits}
-                  </p>
-                </div>
-              )}
+                {convocatoria.benefits && (
+                  <div>
+                    <h3 className="text-[#002F87] font-bold text-base mb-4">
+                      ¿Qué beneficios ofrece?
+                    </h3>
+                    <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-line">
+                      {convocatoria.benefits}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           {convocatoria.terms_url && (
-            <div className="border-t border-gray-200 pt-8">
+            <div className="pt-8">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
                   <FileText className="text-[#002F87]" size={32} />
                 </div>
                 <div>
-                  <h3 className="text-[#002F87] font-bold text-lg mb-2">
+                  <h3 className="text-[#002F87] font-bold text-xl mb-2">
                     Términos de referencia y/o proceso de selección
                   </h3>
                   <a
