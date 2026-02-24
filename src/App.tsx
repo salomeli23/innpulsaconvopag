@@ -5,6 +5,7 @@ import { Convocatoria, FilterStatus } from './types';
 import { ConvocatoriaCard } from './components/ConvocatoriaCard';
 import { FilterBar } from './components/FilterBar';
 import { LoginModal } from './components/LoginModal';
+import AdminPanel from './components/AdminPanel';
 
 function App() {
   const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([]);
@@ -27,6 +28,12 @@ function App() {
 
   function handleLoginSuccess() {
     setIsAuthenticated(true);
+    setIsLoginModalOpen(false);
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    setIsAuthenticated(false);
   }
 
   useEffect(() => {
@@ -82,6 +89,10 @@ function App() {
     setFilteredConvocatorias(filtered);
   }
 
+
+  if (isAuthenticated) {
+    return <AdminPanel onLogout={handleLogout} />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

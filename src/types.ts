@@ -9,6 +9,13 @@ export interface Convocatoria {
   category: string;
   created_at: string;
   updated_at: string;
+  start_time?: string;
+  end_time?: string;
+  registration_url?: string;
+  target_audience?: string;
+  purpose?: string;
+  benefits?: string;
+  terms_url?: string;
 }
 
 export type FilterStatus = 'todas' | 'abierta' | 'cerrada' | 'por-cerrar';
