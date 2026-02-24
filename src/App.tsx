@@ -4,6 +4,7 @@ import { supabase } from './lib/supabase';
 import { Convocatoria, FilterStatus } from './types';
 import { ConvocatoriaCard } from './components/ConvocatoriaCard';
 import { FilterBar } from './components/FilterBar';
+import { LoginModal } from './components/LoginModal';
 
 function App() {
   const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([]);
@@ -11,10 +12,22 @@ function App() {
   const [currentFilter, setCurrentFilter] = useState<FilterStatus>('todas');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     fetchConvocatorias();
+    checkAuth();
   }, []);
+
+  async function checkAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    setIsAuthenticated(!!session);
+  }
+
+  function handleLoginSuccess() {
+    setIsAuthenticated(true);
+  }
 
   useEffect(() => {
     filterConvocatorias();
@@ -97,7 +110,10 @@ function App() {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <button className="text-gray-600 hover:text-gray-800">
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="text-gray-600 hover:text-gray-800"
+              >
                 <User size={20} />
               </button>
               <button className="text-gray-600 hover:text-gray-800">
@@ -152,6 +168,12 @@ function App() {
           </main>
         </div>
       </div>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
     </div>
   );
 }
