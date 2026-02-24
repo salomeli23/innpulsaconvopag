@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Convocatoria, ConvocatoriaTerm } from '../types';
-import { Plus, Edit, Trash2, X, Upload, File } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Upload, File, Eye, EyeOff } from 'lucide-react';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -28,6 +28,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     purpose: '',
     benefits: '',
     terms_url: '',
+    is_active: true,
   });
 
   useEffect(() => {
@@ -179,8 +180,22 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     }
   };
 
+  const handleToggleActive = async (id: string, currentStatus: boolean) => {
+    const action = currentStatus ? 'desactivar' : 'activar';
+    if (confirm(`¿Estás seguro de ${action} esta convocatoria?`)) {
+      const { error } = await supabase
+        .from('convocatorias')
+        .update({ is_active: !currentStatus })
+        .eq('id', id);
+
+      if (!error) {
+        fetchConvocatorias();
+      }
+    }
+  };
+
   const handleDelete = async (id: string) => {
-    if (confirm('¿Estás seguro de eliminar esta convocatoria?')) {
+    if (confirm('¿Estás seguro de eliminar permanentemente esta convocatoria? Esta acción no se puede deshacer.')) {
       const { error } = await supabase
         .from('convocatorias')
         .delete()
@@ -207,6 +222,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       target_audience: '',
       purpose: '',
       benefits: '',
+      is_active: true,
       terms_url: '',
     });
     setEditingId(null);
@@ -532,6 +548,9 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   Estado
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Visibilidad
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Fecha de Cierre
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -544,7 +563,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {convocatorias.map((convocatoria) => (
-                <tr key={convocatoria.id}>
+                <tr key={convocatoria.id} className={!convocatoria.is_active ? 'bg-gray-50' : ''}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{convocatoria.title}</div>
                   </td>
@@ -559,6 +578,17 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       {convocatoria.status}
                     </span>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        convocatoria.is_active
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {convocatoria.is_active ? 'Visible' : 'Oculta'}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(convocatoria.end_date).toLocaleDateString()}
                   </td>
@@ -568,13 +598,26 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleEdit(convocatoria)}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
+                      className="text-blue-600 hover:text-blue-900 mr-3"
+                      title="Editar"
                     >
                       <Edit size={18} />
                     </button>
                     <button
+                      onClick={() => handleToggleActive(convocatoria.id, convocatoria.is_active)}
+                      className={`mr-3 ${
+                        convocatoria.is_active
+                          ? 'text-orange-600 hover:text-orange-900'
+                          : 'text-green-600 hover:text-green-900'
+                      }`}
+                      title={convocatoria.is_active ? 'Desactivar' : 'Activar'}
+                    >
+                      {convocatoria.is_active ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                    <button
                       onClick={() => handleDelete(convocatoria.id)}
                       className="text-red-600 hover:text-red-900"
+                      title="Eliminar permanentemente"
                     >
                       <Trash2 size={18} />
                     </button>

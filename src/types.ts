@@ -19,6 +19,7 @@ export interface Convocatoria {
   category: string;
   created_at: string;
   updated_at: string;
+  is_active: boolean;
   start_time?: string;
   end_time?: string;
   registration_url?: string;
