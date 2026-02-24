@@ -4,9 +4,10 @@ import { ArrowRight } from 'lucide-react';
 
 interface ConvocatoriaCardProps {
   convocatoria: Convocatoria;
+  onClick?: () => void;
 }
 
-export function ConvocatoriaCard({ convocatoria }: ConvocatoriaCardProps) {
+export function ConvocatoriaCard({ convocatoria, onClick }: ConvocatoriaCardProps) {
   const isGradient = convocatoria.image_url.startsWith('/gradient-');
 
   return (
@@ -49,7 +50,10 @@ export function ConvocatoriaCard({ convocatoria }: ConvocatoriaCardProps) {
         <p className="text-gray-600 text-sm leading-relaxed mb-4">
           {convocatoria.description}
         </p>
-        <button className="group w-full mt-4 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-red-700 hover:to-red-800 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2">
+        <button
+          onClick={onClick}
+          className="group w-full mt-4 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-red-700 hover:to-red-800 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
+        >
           <span>Ver más información</span>
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
         </button>

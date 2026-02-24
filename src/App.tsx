@@ -6,6 +6,7 @@ import { ConvocatoriaCard } from './components/ConvocatoriaCard';
 import { FilterBar } from './components/FilterBar';
 import { LoginModal } from './components/LoginModal';
 import AdminPanel from './components/AdminPanel';
+import ConvocatoriaDetail from './components/ConvocatoriaDetail';
 
 function App() {
   const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([]);
@@ -15,6 +16,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [selectedConvocatoria, setSelectedConvocatoria] = useState<Convocatoria | null>(null);
 
   useEffect(() => {
     fetchConvocatorias();
@@ -92,6 +94,15 @@ function App() {
 
   if (isAuthenticated) {
     return <AdminPanel onLogout={handleLogout} />;
+  }
+
+  if (selectedConvocatoria) {
+    return (
+      <ConvocatoriaDetail
+        convocatoria={selectedConvocatoria}
+        onBack={() => setSelectedConvocatoria(null)}
+      />
+    );
   }
 
   return (
@@ -172,7 +183,11 @@ function App() {
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {filteredConvocatorias.map((convocatoria) => (
-                  <ConvocatoriaCard key={convocatoria.id} convocatoria={convocatoria} />
+                  <ConvocatoriaCard
+                    key={convocatoria.id}
+                    convocatoria={convocatoria}
+                    onClick={() => setSelectedConvocatoria(convocatoria)}
+                  />
                 ))}
               </div>
             )}
