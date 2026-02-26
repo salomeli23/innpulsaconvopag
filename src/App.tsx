@@ -124,7 +124,7 @@ function App() {
       <header className="bg-white shadow-sm">
         <div className="border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-between py-4">
+            <div className="flex items-center justify-between h-[100px]">
               {/* Navigation Menu */}
               <nav className="hidden lg:flex items-center space-x-8 text-xs uppercase tracking-wide">
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Inicio</a>
