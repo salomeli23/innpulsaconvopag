@@ -166,7 +166,7 @@ function App() {
           {/* Sidebar */}
           <aside className="w-64 flex-shrink-0">
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Buscar</h2>
+              <h2 className="text-lg font-bold text-gray-800 mb-4 capitalize">Buscar</h2>
               <input
                 type="text"
                 placeholder="Buscar convocatorias..."

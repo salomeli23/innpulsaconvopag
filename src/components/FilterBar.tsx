@@ -10,7 +10,7 @@ export function FilterBar({ currentFilter, onFilterChange }: FilterBarProps) {
     { value: 'todas', label: 'Todas' },
     { value: 'abierta', label: 'Abiertas' },
     { value: 'por-cerrar', label: 'Por Cerrar' },
-    { value: 'cerrada', label: 'Cerradas' },
+    { value: 'cerrada', label: 'Finalizadas' },
   ];
 
   return (

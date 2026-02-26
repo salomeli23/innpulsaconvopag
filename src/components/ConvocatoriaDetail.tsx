@@ -27,8 +27,8 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
         </button>
 
         <article>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#002F87] mb-3 leading-tight">
-            {convocatoria.title}
+          <h1 className="text-3xl md:text-4xl font-bold text-[#002F87] mb-3 leading-tight capitalize">
+            {convocatoria.title.toLowerCase()}
           </h1>
 
           <div className="flex flex-wrap items-center gap-2 mb-6 text-sm">
@@ -39,7 +39,7 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
               <span className="text-green-600 font-medium">Abiertas</span>
             )}
             {convocatoria.status === 'cerrada' && (
-              <span className="text-red-600 font-medium">Cerrada</span>
+              <span className="text-red-600 font-medium">Finalizada</span>
             )}
             <span className="text-gray-400">,</span>
             <span className="text-gray-700">Convocatorias</span>

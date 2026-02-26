@@ -16,8 +16,8 @@ export function ConvocatoriaCard({ convocatoria, onClick }: ConvocatoriaCardProp
         {isGradient ? (
           <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-blue-800 flex items-center justify-center p-6">
             <div className="text-center text-white">
-              <h3 className="text-2xl font-bold mb-3 uppercase leading-tight">
-                {convocatoria.title}
+              <h3 className="text-2xl font-bold mb-3 capitalize leading-tight">
+                {convocatoria.title.toLowerCase()}
               </h3>
             </div>
           </div>
@@ -29,30 +29,35 @@ export function ConvocatoriaCard({ convocatoria, onClick }: ConvocatoriaCardProp
           />
         )}
         <div className="absolute top-3 right-3">
-          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+          <span className={`px-3 py-1 rounded-full text-xs font-bold capitalize ${
             convocatoria.status === 'abierta'
               ? 'bg-green-500 text-white'
               : 'bg-gray-500 text-white'
           }`}>
-            {convocatoria.status}
+            {convocatoria.status === 'cerrada' ? 'Finalizada' : 'Abierta'}
           </span>
         </div>
       </div>
       <div className="p-6">
         <div className="mb-3">
-          <h3 className="text-xl font-bold text-gray-800 mb-2 uppercase">
-            {convocatoria.title}
+          <h3 className="text-xl font-bold text-gray-800 mb-2 capitalize">
+            {convocatoria.title.toLowerCase()}
           </h3>
           {convocatoria.status === 'abierta' && (
             <CountdownTimer endDate={convocatoria.end_date} />
           )}
         </div>
         <p className="text-gray-600 text-sm leading-relaxed mb-4">
-          {convocatoria.description}
+          {convocatoria.description.length > 255
+            ? `${convocatoria.description.substring(0, 255)}...`
+            : convocatoria.description}
         </p>
         <button
           onClick={onClick}
-          className="group w-full mt-4 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-red-700 hover:to-red-800 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
+          className="group w-full mt-4 px-6 py-3 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
+          style={{ backgroundColor: '#0f4d7c' }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0a3a5c'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0f4d7c'}
         >
           <span>Ver más información</span>
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
