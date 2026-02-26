@@ -122,38 +122,52 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center">
-                <img
-                  src="/muestra-1.png"
-                  alt="Comercio, Industria y Turismo | INNpulsa Colombia"
-                  className="h-12"
-                />
+        <div className="border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-center justify-between py-4">
+              {/* Navigation Menu */}
+              <nav className="hidden lg:flex items-center space-x-8 text-xs uppercase tracking-wide">
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Inicio</a>
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Nosotros</a>
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Oferta Innpulsa</a>
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Noticias</a>
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Publicaciones</a>
+                <a
+                  href="https://www.innpulsacolombia.com/re.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#002F87] hover:text-[#001F5C] font-semibold transition-colors"
+                >
+                  Registro Único
+                </a>
+                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Contacto</a>
+              </nav>
+
+              {/* Right Side - Icons and Logo */}
+              <div className="flex items-center space-x-6 ml-auto">
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="text-gray-600 hover:text-gray-800 transition-colors"
+                  aria-label="Login"
+                >
+                  <User size={20} />
+                </button>
+                <button className="text-gray-600 hover:text-gray-800 transition-colors" aria-label="Search">
+                  <Search size={20} />
+                </button>
+
+                {/* Logo Divider */}
+                <div className="h-8 w-px bg-gray-300"></div>
+
+                {/* Logos */}
+                <div className="flex items-center">
+                  <img
+                    src="/muestra-1.png"
+                    alt="Comercio, Industria y Turismo | INNpulsa Colombia"
+                    className="h-10"
+                  />
+                </div>
               </div>
-            </div>
-
-            <nav className="hidden md:flex items-center space-x-6 text-sm">
-              <a href="#" className="text-gray-700 hover:text-red-600 font-medium">INICIO</a>
-              <a href="#" className="text-gray-700 hover:text-red-600 font-medium">NOSOTROS</a>
-              <a href="#" className="text-gray-400 font-medium">OFERTA INNPULSA</a>
-              <a href="#" className="text-gray-700 hover:text-red-600 font-medium">NOTICIAS</a>
-              <a href="#" className="text-gray-700 hover:text-red-600 font-medium">PUBLICACIONES</a>
-              <a href="#" className="text-gray-700 hover:text-red-600 font-medium">REGISTRO</a>
-              <a href="#" className="text-gray-700 hover:text-red-600 font-medium">CONTACTO</a>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setIsLoginModalOpen(true)}
-                className="text-gray-600 hover:text-gray-800"
-              >
-                <User size={20} />
-              </button>
-              <button className="text-gray-600 hover:text-gray-800">
-                <Search size={20} />
-              </button>
             </div>
           </div>
         </div>
