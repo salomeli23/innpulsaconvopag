@@ -256,21 +256,21 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
         </div>
 
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-            <div className="bg-white rounded-lg p-6 w-full max-w-4xl my-8">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-lg p-8 w-full max-w-7xl my-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
                   {editingId ? 'Editar Convocatoria' : 'Nueva Convocatoria'}
                 </h2>
-                <button onClick={resetForm}>
+                <button onClick={resetForm} className="text-gray-500 hover:text-gray-700">
                   <X size={24} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Título *
                     </label>
                     <input
@@ -278,19 +278,19 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       required
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Estado *
                     </label>
                     <select
                       required
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as 'abierta' | 'cerrada' })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     >
                       <option value="abierta">Abierta</option>
                       <option value="cerrada">Cerrada</option>
@@ -298,7 +298,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Fecha de Inicio *
                     </label>
                     <input
@@ -306,12 +306,12 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       required
                       value={formData.start_date?.split('T')[0]}
                       onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Hora de Inicio
                     </label>
                     <input
@@ -319,12 +319,12 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       placeholder="ej: 3:00 pm"
                       value={formData.start_time}
                       onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Fecha de Cierre *
                     </label>
                     <input
@@ -332,12 +332,12 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       required
                       value={formData.end_date?.split('T')[0]}
                       onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Hora de Cierre
                     </label>
                     <input
@@ -345,12 +345,25 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       placeholder="ej: 11:59 pm"
                       value={formData.end_time}
                       onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Categoría *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       URL de Imagen *
                     </label>
                     <input
@@ -359,12 +372,12 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       placeholder="/ruta-imagen.jpg"
                       value={formData.image_url}
                       onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       URL de Inscripción
                     </label>
                     <input
@@ -372,25 +385,12 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       placeholder="https://..."
                       value={formData.registration_url}
                       onChange={(e) => setFormData({ ...formData, registration_url: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Categoría *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       URL de Términos (legacy)
                     </label>
                     <input
@@ -398,16 +398,67 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       placeholder="https://..."
                       value={formData.terms_url}
                       onChange={(e) => setFormData({ ...formData, terms_url: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Descripción *
+                    </label>
+                    <textarea
+                      required
+                      rows={4}
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      ¿Para quién fue creada?
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={formData.target_audience}
+                      onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      ¿Para qué fue creada?
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={formData.purpose}
+                      onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      ¿Qué beneficios ofrece?
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={formData.benefits}
+                      onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
                     Archivos de Términos de Referencia (PDF) - Máximo 15
                   </label>
-                  <div className="space-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {Array.from({ length: 15 }).map((_, index) => {
                       const existingFile = termFiles[index];
                       const isEnabled = index === 0 || termFiles[index - 1] !== undefined;
@@ -417,22 +468,26 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                           key={index}
                           className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
                         >
-                          <div className="flex items-center gap-3 flex-1">
-                            <span className="text-sm font-medium text-gray-600 w-8">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-sm font-medium text-gray-600 flex-shrink-0">
                               {index + 1}.
                             </span>
 
                             {existingFile ? (
-                              <div className="flex items-center gap-2 flex-1">
-                                <File size={16} className="text-red-600" />
-                                <span className="text-sm text-gray-700">{existingFile.file_name}</span>
-                                <span className="text-xs text-gray-500">
-                                  ({(existingFile.file_size / 1024).toFixed(1)} KB)
-                                </span>
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <File size={16} className="text-red-600 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <span className="text-sm text-gray-700 block truncate" title={existingFile.file_name}>
+                                    {existingFile.file_name}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    ({(existingFile.file_size / 1024).toFixed(1)} KB)
+                                  </span>
+                                </div>
                               </div>
                             ) : (
                               <label
-                                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg transition-colors text-sm ${
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm ${
                                   !isEnabled
                                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                     : uploadingFile
@@ -441,7 +496,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                                 }`}
                               >
                                 <Upload size={14} />
-                                {uploadingFile ? 'Subiendo...' : 'Adjuntar PDF'}
+                                {uploadingFile ? 'Subiendo...' : 'Adjuntar'}
                                 <input
                                   type="file"
                                   accept="application/pdf"
@@ -457,7 +512,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                             <button
                               type="button"
                               onClick={() => handleDeleteTermFile(existingFile.id, index)}
-                              className="text-red-600 hover:text-red-800 ml-2"
+                              className="text-red-600 hover:text-red-800 ml-2 flex-shrink-0"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -468,66 +523,17 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Descripción *
-                  </label>
-                  <textarea
-                    required
-                    rows={3}
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    ¿Para quién fue creada?
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={formData.target_audience}
-                    onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    ¿Para qué fue creada?
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={formData.purpose}
-                    onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    ¿Qué beneficios ofrece?
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={formData.benefits}
-                    onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
-                  />
-                </div>
-
-                <div className="flex gap-4 pt-4">
+                <div className="flex gap-4 pt-4 border-t border-gray-200">
                   <button
                     type="submit"
-                    className="flex-1 bg-[#CC0C2E] text-white py-3 rounded-lg hover:bg-[#A00A25] transition-colors"
+                    className="px-8 py-3 bg-[#CC0C2E] text-white font-medium rounded-lg hover:bg-[#A00A25] transition-colors"
                   >
-                    {editingId ? 'Actualizar' : 'Crear'}
+                    {editingId ? 'Actualizar Convocatoria' : 'Crear Convocatoria'}
                   </button>
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition-colors"
+                    className="px-8 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
                   >
                     Cancelar
                   </button>
