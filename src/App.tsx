@@ -164,7 +164,7 @@ function App() {
                   <img
                     src="/muestra-1.png"
                     alt="Comercio, Industria y Turismo | INNpulsa Colombia"
-                    className="h-10"
+                    className="w-[265px] h-[65px] object-contain"
                   />
                 </div>
               </div>
