@@ -581,7 +581,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                           : 'bg-red-100 text-red-800'
                       }`}
                     >
-                      {convocatoria.status === 'cerrada' ? 'Finalizada' : 'Abierta'}
+                      {convocatoria.status === 'cerrada' ? 'Por Finalizar' : 'Abierta'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
