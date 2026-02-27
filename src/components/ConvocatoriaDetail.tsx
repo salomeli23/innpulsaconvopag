@@ -12,7 +12,8 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
     return date.toLocaleDateString('es-CO', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      timeZone: 'UTC'
     });
   };
 
