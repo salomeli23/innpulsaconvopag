@@ -48,7 +48,7 @@ export function CountdownTimer({ endDate }: CountdownTimerProps) {
     );
   }
 
-  if (timeLeft.days === 0 && timeLeft.hours < 24) {
+  if (timeLeft.days === 0) {
     return (
       <div className="flex items-center gap-2 text-red-500 text-sm font-bold">
         <Clock size={16} className="animate-pulse" />
@@ -61,7 +61,7 @@ export function CountdownTimer({ endDate }: CountdownTimerProps) {
     );
   }
 
-  if (timeLeft.days <= 2) {
+  if (timeLeft.days <= 3) {
     return (
       <div className="flex items-center gap-2 text-orange-600 text-sm font-medium">
         <Clock size={16} className="animate-pulse" />
