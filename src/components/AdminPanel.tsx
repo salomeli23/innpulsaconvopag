@@ -686,7 +686,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(convocatoria.end_date).toLocaleDateString()}
+                    {new Date(convocatoria.end_date).toLocaleDateString('es-CO', { timeZone: 'UTC' })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {convocatoria.category}
