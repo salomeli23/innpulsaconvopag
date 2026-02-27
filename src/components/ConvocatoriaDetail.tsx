@@ -200,7 +200,7 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
                             download={term.file_name}
                             className="text-blue-600 hover:text-blue-800 underline text-sm font-medium"
                           >
-                            {term.file_name}
+                            {term.display_name || term.file_name}
                           </a>
                           <span className="text-xs text-gray-500">
                             ({(term.file_size / 1024).toFixed(1)} KB)

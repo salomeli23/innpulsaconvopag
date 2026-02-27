@@ -4,6 +4,7 @@ export interface ConvocatoriaTerm {
   file_name: string;
   file_url: string;
   file_size: number;
+  display_name?: string;
   uploaded_at: string;
   created_at: string;
 }

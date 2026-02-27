@@ -13,6 +13,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [termFiles, setTermFiles] = useState<ConvocatoriaTerm[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [formData, setFormData] = useState<Partial<Convocatoria>>({
     title: '',
     description: '',
@@ -107,6 +108,37 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setShowForm(true);
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+
+    if (!file.type.startsWith('image/')) {
+      alert('Solo se permiten archivos de imagen');
+      e.target.value = '';
+      return;
+    }
+
+    setUploadingImage(true);
+
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      await new Promise((resolve) => {
+        reader.onload = () => {
+          const base64 = reader.result as string;
+          setFormData({ ...formData, image_url: base64 });
+          resolve(null);
+        };
+      });
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, slotIndex: number) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -115,6 +147,12 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
     if (file.type !== 'application/pdf') {
       alert('Solo se permiten archivos PDF');
+      e.target.value = '';
+      return;
+    }
+
+    const displayName = prompt('Ingrese un nombre para mostrar este archivo:', file.name.replace('.pdf', ''));
+    if (!displayName) {
       e.target.value = '';
       return;
     }
@@ -134,6 +172,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             file_name: file.name,
             file_url: base64,
             file_size: file.size,
+            display_name: displayName,
           };
 
           if (editingId) {
@@ -299,7 +338,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Fecha de Inicio *
+                      Fecha de Inicio * <span className="text-xs text-gray-500">(Zona horaria: Colombia UTC-5)</span>
                     </label>
                     <input
                       type="date"
@@ -312,11 +351,10 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Hora de Inicio
+                      Hora de Inicio <span className="text-xs text-gray-500">(Hora de Colombia)</span>
                     </label>
                     <input
-                      type="text"
-                      placeholder="ej: 3:00 pm"
+                      type="time"
                       value={formData.start_time}
                       onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
@@ -325,7 +363,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Fecha de Cierre *
+                      Fecha de Cierre * <span className="text-xs text-gray-500">(Zona horaria: Colombia UTC-5)</span>
                     </label>
                     <input
                       type="date"
@@ -338,11 +376,10 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Hora de Cierre
+                      Hora de Cierre <span className="text-xs text-gray-500">(Hora de Colombia)</span>
                     </label>
                     <input
-                      type="text"
-                      placeholder="ej: 11:59 pm"
+                      type="time"
                       value={formData.end_time}
                       onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
@@ -364,16 +401,47 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      URL de Imagen *
+                      Imagen de la Convocatoria *
                     </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="/ruta-imagen.jpg"
-                      value={formData.image_url}
-                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
-                    />
+                    {formData.image_url ? (
+                      <div className="space-y-2">
+                        <div className="relative">
+                          <img
+                            src={formData.image_url}
+                            alt="Preview"
+                            className="w-full h-48 object-cover rounded-lg border border-gray-300"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, image_url: '' })}
+                            className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full hover:bg-red-700 shadow-lg"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                        uploadingImage
+                          ? 'border-gray-300 bg-gray-100 cursor-not-allowed'
+                          : 'border-gray-300 hover:border-[#CC0C2E] hover:bg-gray-50'
+                      }`}>
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Upload className="w-10 h-10 mb-2 text-gray-400" />
+                          <p className="text-sm text-gray-600">
+                            {uploadingImage ? 'Subiendo imagen...' : 'Click para subir imagen'}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">PNG, JPG, JPEG</p>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          disabled={uploadingImage}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
                   </div>
 
                   <div className="md:col-span-2">
@@ -477,11 +545,16 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                               <div className="flex items-center gap-2 flex-1 min-w-0">
                                 <File size={16} className="text-red-600 flex-shrink-0" />
                                 <div className="flex-1 min-w-0">
-                                  <span className="text-sm text-gray-700 block truncate" title={existingFile.file_name}>
-                                    {existingFile.file_name}
+                                  <span className="text-sm text-gray-700 block truncate font-medium" title={existingFile.display_name || existingFile.file_name}>
+                                    {existingFile.display_name || existingFile.file_name}
                                   </span>
                                   <span className="text-xs text-gray-500">
-                                    ({(existingFile.file_size / 1024).toFixed(1)} KB)
+                                    {existingFile.display_name && existingFile.file_name !== existingFile.display_name && (
+                                      <span className="block truncate" title={existingFile.file_name}>
+                                        {existingFile.file_name} •{' '}
+                                      </span>
+                                    )}
+                                    {(existingFile.file_size / 1024).toFixed(1)} KB
                                   </span>
                                 </div>
                               </div>
