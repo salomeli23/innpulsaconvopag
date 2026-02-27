@@ -151,12 +151,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       return;
     }
 
-    const displayName = prompt('Ingrese un nombre para mostrar este archivo:', file.name.replace('.pdf', ''));
-    if (!displayName) {
-      e.target.value = '';
-      return;
-    }
-
     setUploadingFile(true);
 
     try {
@@ -172,7 +166,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             file_name: file.name,
             file_url: base64,
             file_size: file.size,
-            display_name: displayName,
+            display_name: '',
           };
 
           if (editingId) {
@@ -201,6 +195,25 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     } finally {
       setUploadingFile(false);
       e.target.value = '';
+    }
+  };
+
+  const handleUpdateTermDisplayName = async (termId: string, displayName: string) => {
+    if (termId.startsWith('temp-')) {
+      setTermFiles(termFiles.map(t =>
+        t.id === termId ? { ...t, display_name: displayName } : t
+      ));
+    } else {
+      const { error } = await supabase
+        .from('convocatoria_terms')
+        .update({ display_name: displayName })
+        .eq('id', termId);
+
+      if (!error) {
+        setTermFiles(termFiles.map(t =>
+          t.id === termId ? { ...t, display_name: displayName } : t
+        ));
+      }
     }
   };
 
@@ -526,7 +539,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     Archivos de Términos de Referencia (PDF) - Máximo 15
                   </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="space-y-3">
                     {Array.from({ length: 15 }).map((_, index) => {
                       const existingFile = termFiles[index];
                       const isEnabled = index === 0 || termFiles[index - 1] !== undefined;
@@ -534,33 +547,47 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                       return (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                          className="p-4 bg-gray-50 rounded-lg border border-gray-200"
                         >
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <span className="text-sm font-medium text-gray-600 flex-shrink-0">
+                          <div className="flex items-start gap-3">
+                            <span className="text-sm font-medium text-gray-600 flex-shrink-0 mt-2">
                               {index + 1}.
                             </span>
 
                             {existingFile ? (
-                              <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <File size={16} className="text-red-600 flex-shrink-0" />
-                                <div className="flex-1 min-w-0">
-                                  <span className="text-sm text-gray-700 block truncate font-medium" title={existingFile.display_name || existingFile.file_name}>
-                                    {existingFile.display_name || existingFile.file_name}
+                              <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <File size={16} className="text-red-600 flex-shrink-0" />
+                                  <span className="text-sm text-gray-700 font-medium">
+                                    {existingFile.file_name}
                                   </span>
                                   <span className="text-xs text-gray-500">
-                                    {existingFile.display_name && existingFile.file_name !== existingFile.display_name && (
-                                      <span className="block truncate" title={existingFile.file_name}>
-                                        {existingFile.file_name} •{' '}
-                                      </span>
-                                    )}
-                                    {(existingFile.file_size / 1024).toFixed(1)} KB
+                                    ({(existingFile.file_size / 1024).toFixed(1)} KB)
                                   </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteTermFile(existingFile.id, index)}
+                                    className="text-red-600 hover:text-red-800 ml-auto flex-shrink-0"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Nombre para mostrar (opcional)
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="Ej: Términos y condiciones"
+                                    value={existingFile.display_name || ''}
+                                    onChange={(e) => handleUpdateTermDisplayName(existingFile.id, e.target.value)}
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                                  />
                                 </div>
                               </div>
                             ) : (
                               <label
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm ${
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${
                                   !isEnabled
                                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                     : uploadingFile
@@ -568,8 +595,8 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                                     : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
                                 }`}
                               >
-                                <Upload size={14} />
-                                {uploadingFile ? 'Subiendo...' : 'Adjuntar'}
+                                <Upload size={16} />
+                                {uploadingFile ? 'Subiendo...' : 'Adjuntar PDF'}
                                 <input
                                   type="file"
                                   accept="application/pdf"
@@ -580,16 +607,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                               </label>
                             )}
                           </div>
-
-                          {existingFile && (
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTermFile(existingFile.id, index)}
-                              className="text-red-600 hover:text-red-800 ml-2 flex-shrink-0"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          )}
                         </div>
                       );
                     })}
