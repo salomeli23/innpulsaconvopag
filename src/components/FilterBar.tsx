@@ -9,7 +9,7 @@ export function FilterBar({ currentFilter, onFilterChange }: FilterBarProps) {
   const filters: { value: FilterStatus; label: string }[] = [
     { value: 'todas', label: 'Todas' },
     { value: 'abierta', label: 'Abiertas' },
-    { value: 'por-cerrar', label: 'Por Cerrar' },
+    { value: 'por-cerrar', label: 'Por Finalizar' },
     { value: 'cerrada', label: 'Finalizadas' },
   ];
 
