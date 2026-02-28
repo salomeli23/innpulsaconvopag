@@ -127,7 +127,7 @@ export function Aliados({ onBack }: AliadosProps) {
           <img
             src="https://res.cloudinary.com/dewemwkqf/image/upload/v1772317291/grok-image-38005b63-49a9-4fee-8aae-e42907d0dda8_1_ueqiz4.jpg"
             alt="Regístrate como aliado de INNpulsa Colombia"
-            className="w-full max-w-[1400px] h-[520px] object-cover"
+            className="w-full max-w-[1400px] h-[670px] object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent hover:from-black/20 transition-all"></div>
         </div>
