@@ -118,7 +118,7 @@ export function Aliados({ onBack }: AliadosProps) {
       <div className="relative">
         <div className="relative overflow-hidden flex justify-center bg-gray-100">
           <img
-            src="/WhatsApp_Image_2026-02-27_at_7.58.43_PM.jpeg"
+            src="https://res.cloudinary.com/dewemwkqf/image/upload/v1772317291/grok-image-38005b63-49a9-4fee-8aae-e42907d0dda8_1_ueqiz4.jpg"
             alt="Regístrate como aliado de INNpulsa Colombia"
             className="w-full max-w-[1200px] h-[400px] object-cover"
           />
