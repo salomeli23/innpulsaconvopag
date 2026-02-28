@@ -7,6 +7,7 @@ import { FilterBar } from './components/FilterBar';
 import { LoginModal } from './components/LoginModal';
 import AdminPanel from './components/AdminPanel';
 import ConvocatoriaDetail from './components/ConvocatoriaDetail';
+import { Aliados } from './components/Aliados';
 
 function App() {
   const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([]);
@@ -17,6 +18,7 @@ function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedConvocatoria, setSelectedConvocatoria] = useState<Convocatoria | null>(null);
+  const [showAliados, setShowAliados] = useState(false);
 
   useEffect(() => {
     fetchConvocatorias();
@@ -109,6 +111,10 @@ function App() {
     return <AdminPanel onLogout={handleLogout} />;
   }
 
+  if (showAliados) {
+    return <Aliados onBack={() => setShowAliados(false)} />;
+  }
+
   if (selectedConvocatoria) {
     return (
       <ConvocatoriaDetail
@@ -140,6 +146,12 @@ function App() {
                 >
                   Registro Único
                 </a>
+                <button
+                  onClick={() => setShowAliados(true)}
+                  className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                >
+                  Aliados
+                </button>
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Contacto</a>
               </nav>
 
