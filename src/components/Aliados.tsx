@@ -18,12 +18,13 @@ export function Aliados({ onBack }: AliadosProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [captchaValue, setCaptchaValue] = useState('');
-  const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const num1 = Math.floor(Math.random() * 10) + 1;
-  const num2 = Math.floor(Math.random() * 10) + 1;
-  const correctAnswer = num1 + num2;
+  const [captchaNumbers] = useState(() => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    return { num1, num2, answer: num1 + num2 };
+  });
 
   const scrollToForm = () => {
     const formElement = document.getElementById('registro-form');
@@ -42,7 +43,7 @@ export function Aliados({ onBack }: AliadosProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (parseInt(captchaValue) !== correctAnswer) {
+    if (parseInt(captchaValue) !== captchaNumbers.answer) {
       setSubmitMessage({ type: 'error', text: 'La respuesta del captcha es incorrecta' });
       return;
     }
@@ -341,7 +342,7 @@ export function Aliados({ onBack }: AliadosProps) {
                 </label>
                 <div className="flex items-center gap-4">
                   <div className="bg-white px-6 py-4 rounded-lg border-2 border-gray-300 font-mono text-2xl font-bold text-gray-900">
-                    {num1} + {num2} = ?
+                    {captchaNumbers.num1} + {captchaNumbers.num2} = ?
                   </div>
                   <input
                     type="number"
