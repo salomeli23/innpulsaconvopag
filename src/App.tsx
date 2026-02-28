@@ -8,7 +8,6 @@ import { LoginModal } from './components/LoginModal';
 import AdminPanel from './components/AdminPanel';
 import ConvocatoriaDetail from './components/ConvocatoriaDetail';
 import { Aliados } from './components/Aliados';
-import { HeroBanner } from './components/HeroBanner';
 
 function App() {
   const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([]);
@@ -234,9 +233,6 @@ function App() {
         </div>
         <div className="h-1 bg-red-600"></div>
       </header>
-
-      {/* Hero Banner */}
-      <HeroBanner onRegisterClick={() => setShowAliados(true)} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">

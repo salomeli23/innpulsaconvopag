@@ -1,6 +1,7 @@
 import { Search, User } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { HeroBanner } from './HeroBanner';
 
 interface AliadosProps {
   onBack: () => void;
@@ -148,16 +149,7 @@ export function Aliados({ onBack }: AliadosProps) {
         <div className="h-1 bg-red-600"></div>
       </header>
 
-      <div className="relative cursor-pointer" onClick={scrollToForm}>
-        <div className="relative overflow-hidden flex justify-center bg-gray-100">
-          <img
-            src="https://res.cloudinary.com/dewemwkqf/image/upload/v1772317291/grok-image-38005b63-49a9-4fee-8aae-e42907d0dda8_1_ueqiz4.jpg"
-            alt="Regístrate como aliado de INNpulsa Colombia"
-            className="w-full max-w-[1400px] h-[670px] object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent hover:from-black/20 transition-all"></div>
-        </div>
-      </div>
+      <HeroBanner onRegisterClick={scrollToForm} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
