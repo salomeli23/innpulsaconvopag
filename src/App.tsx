@@ -157,12 +157,16 @@ function App() {
                 >
                   Registro Único
                 </a>
-                <button
-                  onClick={() => setShowAliados(true)}
+                <a
+                  href="/aliados"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowAliados(true);
+                  }}
                   className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
                 >
                   Aliados
-                </button>
+                </a>
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Contacto</a>
               </nav>
 
@@ -211,15 +215,17 @@ function App() {
                 >
                   Registro Único
                 </a>
-                <button
-                  onClick={() => {
+                <a
+                  href="/aliados"
+                  onClick={(e) => {
+                    e.preventDefault();
                     setShowAliados(true);
                     setIsMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide"
+                  className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide"
                 >
                   Aliados
-                </button>
+                </a>
                 <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Contacto</a>
               </nav>
             </div>
