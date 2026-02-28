@@ -24,6 +24,13 @@ export function Aliados({ onBack }: AliadosProps) {
   const num2 = Math.floor(Math.random() * 10) + 1;
   const correctAnswer = num1 + num2;
 
+  const scrollToForm = () => {
+    const formElement = document.getElementById('registro-form');
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -115,14 +122,14 @@ export function Aliados({ onBack }: AliadosProps) {
         <div className="h-1 bg-red-600"></div>
       </header>
 
-      <div className="relative">
+      <div className="relative cursor-pointer" onClick={scrollToForm}>
         <div className="relative overflow-hidden flex justify-center bg-gray-100">
           <img
             src="https://res.cloudinary.com/dewemwkqf/image/upload/v1772317291/grok-image-38005b63-49a9-4fee-8aae-e42907d0dda8_1_ueqiz4.jpg"
             alt="Regístrate como aliado de INNpulsa Colombia"
-            className="w-full max-w-[1200px] h-[400px] object-cover"
+            className="w-full h-auto object-contain"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent hover:from-black/20 transition-all"></div>
         </div>
       </div>
 
@@ -195,7 +202,7 @@ export function Aliados({ onBack }: AliadosProps) {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div id="registro-form" className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
             <h2 className="text-3xl font-bold text-gray-900">Formulario de Registro</h2>
             <p className="text-gray-600 mt-2">Complete la información de su empresa</p>
