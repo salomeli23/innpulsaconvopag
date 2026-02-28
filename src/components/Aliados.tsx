@@ -19,6 +19,7 @@ export function Aliados({ onBack }: AliadosProps) {
   const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [captchaValue, setCaptchaValue] = useState('');
   const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const num1 = Math.floor(Math.random() * 10) + 1;
   const num2 = Math.floor(Math.random() * 10) + 1;
@@ -56,7 +57,7 @@ export function Aliados({ onBack }: AliadosProps) {
 
       if (error) throw error;
 
-      setSubmitMessage({ type: 'success', text: 'Registro exitoso. Nos pondremos en contacto pronto.' });
+      setShowSuccessModal(true);
       setFormData({
         company_name: '',
         nit: '',
@@ -76,6 +77,30 @@ export function Aliados({ onBack }: AliadosProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform animate-scale-in">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Registro Exitoso</h3>
+              <p className="text-gray-600 mb-8">
+                Gracias por registrarte. Nos pondremos en contacto pronto para continuar con el proceso.
+              </p>
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="w-full px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-xl hover:from-red-700 hover:to-red-800 transform hover:scale-105 transition-all shadow-lg"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="bg-white shadow-sm">
         <div className="border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6">
@@ -231,7 +256,7 @@ export function Aliados({ onBack }: AliadosProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
                   <label htmlFor="company_name" className="block text-sm font-semibold text-gray-900 mb-2">
-                    Nombre de la Empresa *
+                    Nombre de la Empresa o Persona Natural *
                   </label>
                   <input
                     type="text"
@@ -241,13 +266,13 @@ export function Aliados({ onBack }: AliadosProps) {
                     value={formData.company_name}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
-                    placeholder="Ej: Empresa Innovadora S.A.S."
+                    placeholder="Ej: Empresa Innovadora S.A.S. o Juan Pérez"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="nit" className="block text-sm font-semibold text-gray-900 mb-2">
-                    NIT *
+                    NIT/Cédula *
                   </label>
                   <input
                     type="text"
@@ -257,23 +282,7 @@ export function Aliados({ onBack }: AliadosProps) {
                     value={formData.nit}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
-                    placeholder="000000000-0"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="sector" className="block text-sm font-semibold text-gray-900 mb-2">
-                    Sector o Industria *
-                  </label>
-                  <input
-                    type="text"
-                    id="sector"
-                    name="sector"
-                    required
-                    value={formData.sector}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all"
-                    placeholder="Ej: Tecnología, Salud, Educación"
+                    placeholder="000000000-0 o 1234567890"
                   />
                 </div>
 
