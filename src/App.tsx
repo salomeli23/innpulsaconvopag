@@ -1,4 +1,4 @@
-import { Search, User } from 'lucide-react';
+import { Search, User, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { Convocatoria, FilterStatus } from './types';
@@ -19,6 +19,8 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedConvocatoria, setSelectedConvocatoria] = useState<Convocatoria | null>(null);
   const [showAliados, setShowAliados] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchConvocatorias();
@@ -127,12 +129,21 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm relative z-50">
         <div className="border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-between h-[100px]">
-              {/* Navigation Menu */}
-              <nav className="hidden lg:flex items-center space-x-8 text-xs uppercase tracking-wide">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="flex items-center justify-between h-20 lg:h-[100px]">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden text-gray-600 hover:text-gray-800 transition-colors p-2"
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+
+              {/* Navigation Menu - Desktop */}
+              <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-xs uppercase tracking-wide">
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Inicio</a>
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Nosotros</a>
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Oferta Innpulsa</a>
@@ -156,60 +167,105 @@ function App() {
               </nav>
 
               {/* Right Side - Icons and Logo */}
-              <div className="flex items-center space-x-6 ml-auto">
+              <div className="flex items-center space-x-3 sm:space-x-4 lg:space-x-6 ml-auto">
                 <button
                   onClick={() => setIsLoginModalOpen(true)}
-                  className="text-gray-600 hover:text-gray-800 transition-colors"
+                  className="text-gray-600 hover:text-gray-800 transition-colors p-2"
                   aria-label="Login"
                 >
                   <User size={20} />
                 </button>
-                <button className="text-gray-600 hover:text-gray-800 transition-colors" aria-label="Search">
+                <button className="hidden sm:block text-gray-600 hover:text-gray-800 transition-colors p-2" aria-label="Search">
                   <Search size={20} />
                 </button>
 
                 {/* Logo Divider */}
-                <div className="h-8 w-px bg-gray-300"></div>
+                <div className="hidden sm:block h-8 w-px bg-gray-300"></div>
 
                 {/* Logos */}
                 <div className="flex items-center">
                   <img
                     src="/muestra-1.png"
                     alt="Comercio, Industria y Turismo | INNpulsa Colombia"
-                    className="w-[265px] h-[65px] object-contain"
+                    className="w-32 h-auto sm:w-40 md:w-48 lg:w-[265px] object-contain"
                   />
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="lg:hidden border-t border-gray-200 bg-white">
+              <nav className="px-4 py-4 space-y-3">
+                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Inicio</a>
+                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Nosotros</a>
+                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Oferta Innpulsa</a>
+                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Noticias</a>
+                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Publicaciones</a>
+                <a
+                  href="https://www.innpulsacolombia.com/re.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-[#002F87] hover:text-[#001F5C] font-semibold transition-colors py-2 text-sm uppercase tracking-wide"
+                >
+                  Registro Único
+                </a>
+                <button
+                  onClick={() => {
+                    setShowAliados(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide"
+                >
+                  Aliados
+                </button>
+                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Contacto</a>
+              </nav>
+            </div>
+          )}
         </div>
         <div className="h-1 bg-red-600"></div>
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
+        <div className="lg:flex gap-8">
+          {/* Mobile Filter Toggle Button */}
+          <div className="lg:hidden mb-4">
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="w-full flex items-center justify-between bg-white rounded-lg shadow-sm p-4 text-gray-700 font-medium"
+            >
+              <span>Filtros y Búsqueda</span>
+              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+
           {/* Sidebar */}
-          <aside className="w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-lg font-bold text-gray-800 mb-4 capitalize">Buscar</h2>
+          <aside className={`
+            ${isSidebarOpen ? 'block' : 'hidden'} lg:block
+            w-full lg:w-64 flex-shrink-0 mb-6 lg:mb-0
+          `}>
+            <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6 mb-4 lg:mb-6">
+              <h2 className="text-base lg:text-lg font-bold text-gray-800 mb-3 lg:mb-4 capitalize">Buscar</h2>
               <input
                 type="text"
                 placeholder="Buscar convocatorias..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full px-3 lg:px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-600 text-sm lg:text-base"
               />
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Filtrar por estado</h2>
+            <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+              <h2 className="text-base lg:text-lg font-bold text-gray-800 mb-3 lg:mb-4">Filtrar por estado</h2>
               <FilterBar currentFilter={currentFilter} onFilterChange={setCurrentFilter} />
             </div>
           </aside>
 
           {/* Cards Grid */}
-          <main className="flex-1">
+          <main className="flex-1 min-w-0">
             {loading ? (
               <div className="text-center py-12">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
@@ -220,7 +276,7 @@ function App() {
                 <p className="text-gray-600">No se encontraron convocatorias.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
                 {filteredConvocatorias.map((convocatoria) => (
                   <ConvocatoriaCard
                     key={convocatoria.id}

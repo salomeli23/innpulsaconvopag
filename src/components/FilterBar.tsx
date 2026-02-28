@@ -19,7 +19,7 @@ export function FilterBar({ currentFilter, onFilterChange }: FilterBarProps) {
         <button
           key={filter.value}
           onClick={() => onFilterChange(filter.value)}
-          className={`w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
+          className={`w-full px-3 lg:px-4 py-2 lg:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-colors text-left ${
             currentFilter === filter.value
               ? 'bg-red-600 text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
