@@ -182,22 +182,6 @@ function App() {
                         Convocatorias
                       </a>
                       <a
-                        href="https://www.innpulsacolombia.com/category/eventos/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block px-4 py-2 text-xs uppercase tracking-wide text-gray-700 hover:bg-gray-100 transition-colors font-medium"
-                      >
-                        Evento
-                      </a>
-                      <a
-                        href="https://www.innpulsacolombia.com/category/proveedores/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block px-4 py-2 text-xs uppercase tracking-wide text-gray-700 hover:bg-gray-100 transition-colors font-medium"
-                      >
-                        Proveedores
-                      </a>
-                      <a
                         href="https://www.innpulsacolombia.com/aliados.html"
                         target="_blank"
                         rel="noopener noreferrer"
