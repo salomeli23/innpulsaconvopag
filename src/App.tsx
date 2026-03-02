@@ -22,6 +22,7 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isOfertaMenuOpen, setIsOfertaMenuOpen] = useState(false);
+  const [closeTimer, setCloseTimer] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchConvocatorias();
@@ -151,8 +152,19 @@ function App() {
                 {/* Oferta Innpulsa Dropdown */}
                 <div
                   className="relative"
-                  onMouseEnter={() => setIsOfertaMenuOpen(true)}
-                  onMouseLeave={() => setIsOfertaMenuOpen(false)}
+                  onMouseEnter={() => {
+                    if (closeTimer) {
+                      clearTimeout(closeTimer);
+                      setCloseTimer(null);
+                    }
+                    setIsOfertaMenuOpen(true);
+                  }}
+                  onMouseLeave={() => {
+                    const timer = setTimeout(() => {
+                      setIsOfertaMenuOpen(false);
+                    }, 4000);
+                    setCloseTimer(timer);
+                  }}
                 >
                   <button className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-1">
                     OFERTA INNPULSA
