@@ -177,7 +177,7 @@ function App() {
                         href="https://www.innpulsacolombia.com/convocatorias.html"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="block px-4 py-2 text-xs uppercase tracking-wide text-gray-700 hover:bg-gray-100 transition-colors font-medium"
                       >
                         Convocatorias
                       </a>
@@ -185,7 +185,7 @@ function App() {
                         href="https://www.innpulsacolombia.com/category/eventos/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="block px-4 py-2 text-xs uppercase tracking-wide text-gray-700 hover:bg-gray-100 transition-colors font-medium"
                       >
                         Evento
                       </a>
@@ -193,7 +193,7 @@ function App() {
                         href="https://www.innpulsacolombia.com/category/proveedores/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="block px-4 py-2 text-xs uppercase tracking-wide text-gray-700 hover:bg-gray-100 transition-colors font-medium"
                       >
                         Proveedores
                       </a>
@@ -201,7 +201,7 @@ function App() {
                         href="https://www.innpulsacolombia.com/aliados.html"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="block px-4 py-2 text-xs uppercase tracking-wide text-gray-700 hover:bg-gray-100 transition-colors font-medium"
                       >
                         Aliados
                       </a>
