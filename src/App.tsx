@@ -145,8 +145,8 @@ function App() {
 
               {/* Navigation Menu - Desktop */}
               <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-xs uppercase tracking-wide">
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Inicio</a>
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Nosotros</a>
+                <a href="https://www.innpulsacolombia.com/" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Inicio</a>
+                <a href="https://www.innpulsacolombia.com/nosotros/" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Nosotros</a>
 
                 {/* Oferta Innpulsa Dropdown */}
                 <div
@@ -197,8 +197,8 @@ function App() {
                   )}
                 </div>
 
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Noticias</a>
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Publicaciones</a>
+                <a href="https://www.innpulsacolombia.com/noticias/" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Noticias</a>
+                <a href="https://www.innpulsacolombia.com/centro-de-recursos/" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Publicaciones</a>
                 <a
                   href="https://www.innpulsacolombia.com/re.html"
                   target="_blank"
@@ -207,17 +207,7 @@ function App() {
                 >
                   Registro Único
                 </a>
-                <a
-                  href="/aliados"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowAliados(true);
-                  }}
-                  className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
-                >
-                  Aliados
-                </a>
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Contacto</a>
+                <a href="https://www.innpulsacolombia.com/escribenos/" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Contacto</a>
               </nav>
 
               {/* Right Side - Icons and Logo */}
@@ -252,8 +242,8 @@ function App() {
           {isMobileMenuOpen && (
             <div className="lg:hidden border-t border-gray-200 bg-white">
               <nav className="px-4 py-4 space-y-3">
-                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Inicio</a>
-                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Nosotros</a>
+                <a href="https://www.innpulsacolombia.com/" target="_blank" rel="noopener noreferrer" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Inicio</a>
+                <a href="https://www.innpulsacolombia.com/nosotros/" target="_blank" rel="noopener noreferrer" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Nosotros</a>
 
                 {/* Oferta Innpulsa Mobile Dropdown */}
                 <div>
@@ -302,8 +292,8 @@ function App() {
                   )}
                 </div>
 
-                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Noticias</a>
-                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Publicaciones</a>
+                <a href="https://www.innpulsacolombia.com/noticias/" target="_blank" rel="noopener noreferrer" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Noticias</a>
+                <a href="https://www.innpulsacolombia.com/centro-de-recursos/" target="_blank" rel="noopener noreferrer" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Publicaciones</a>
                 <a
                   href="https://www.innpulsacolombia.com/re.html"
                   target="_blank"
@@ -312,18 +302,7 @@ function App() {
                 >
                   Registro Único
                 </a>
-                <a
-                  href="/aliados"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowAliados(true);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide"
-                >
-                  Aliados
-                </a>
-                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Contacto</a>
+                <a href="https://www.innpulsacolombia.com/escribenos/" target="_blank" rel="noopener noreferrer" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Contacto</a>
               </nav>
             </div>
           )}
