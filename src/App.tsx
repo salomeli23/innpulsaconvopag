@@ -1,4 +1,4 @@
-import { Search, User, Menu, X } from 'lucide-react';
+import { Search, User, Menu, X, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { Convocatoria, FilterStatus } from './types';
@@ -21,6 +21,7 @@ function App() {
   const [showAliados, setShowAliados] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isOfertaMenuOpen, setIsOfertaMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchConvocatorias();
@@ -146,7 +147,56 @@ function App() {
               <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-xs uppercase tracking-wide">
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Inicio</a>
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Nosotros</a>
-                <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Oferta Innpulsa</a>
+
+                {/* Oferta Innpulsa Dropdown */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setIsOfertaMenuOpen(true)}
+                  onMouseLeave={() => setIsOfertaMenuOpen(false)}
+                >
+                  <button className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-1">
+                    Oferta Innpulsa
+                    <ChevronDown size={14} className={`transition-transform ${isOfertaMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isOfertaMenuOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-56 bg-white shadow-lg rounded-md py-2 z-50">
+                      <a
+                        href="https://www.innpulsacolombia.com/convocatorias.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        Convocatorias
+                      </a>
+                      <a
+                        href="https://www.innpulsacolombia.com/category/eventos/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        Evento
+                      </a>
+                      <a
+                        href="https://www.innpulsacolombia.com/category/proveedores/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        Proveedores
+                      </a>
+                      <a
+                        href="https://www.innpulsacolombia.com/aliados.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        Aliados
+                      </a>
+                    </div>
+                  )}
+                </div>
+
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Noticias</a>
                 <a href="#" className="text-gray-700 hover:text-gray-900 font-medium transition-colors">Publicaciones</a>
                 <a
@@ -204,7 +254,54 @@ function App() {
               <nav className="px-4 py-4 space-y-3">
                 <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Inicio</a>
                 <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Nosotros</a>
-                <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Oferta Innpulsa</a>
+
+                {/* Oferta Innpulsa Mobile Dropdown */}
+                <div>
+                  <button
+                    onClick={() => setIsOfertaMenuOpen(!isOfertaMenuOpen)}
+                    className="w-full flex items-center justify-between text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide"
+                  >
+                    Oferta Innpulsa
+                    <ChevronDown size={16} className={`transition-transform ${isOfertaMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isOfertaMenuOpen && (
+                    <div className="ml-4 mt-2 space-y-2">
+                      <a
+                        href="https://www.innpulsacolombia.com/convocatorias.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-gray-600 hover:text-gray-900 transition-colors py-1 text-sm"
+                      >
+                        Convocatorias
+                      </a>
+                      <a
+                        href="https://www.innpulsacolombia.com/category/eventos/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-gray-600 hover:text-gray-900 transition-colors py-1 text-sm"
+                      >
+                        Evento
+                      </a>
+                      <a
+                        href="https://www.innpulsacolombia.com/category/proveedores/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-gray-600 hover:text-gray-900 transition-colors py-1 text-sm"
+                      >
+                        Proveedores
+                      </a>
+                      <a
+                        href="https://www.innpulsacolombia.com/aliados.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-gray-600 hover:text-gray-900 transition-colors py-1 text-sm"
+                      >
+                        Aliados
+                      </a>
+                    </div>
+                  )}
+                </div>
+
                 <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Noticias</a>
                 <a href="#" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Publicaciones</a>
                 <a
