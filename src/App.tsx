@@ -155,7 +155,7 @@ function App() {
                   onMouseLeave={() => setIsOfertaMenuOpen(false)}
                 >
                   <button className="text-gray-700 hover:text-gray-900 font-medium transition-colors flex items-center gap-1">
-                    Oferta Innpulsa
+                    OFERTA INNPULSA
                     <ChevronDown size={14} className={`transition-transform ${isOfertaMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
 
@@ -251,7 +251,7 @@ function App() {
                     onClick={() => setIsOfertaMenuOpen(!isOfertaMenuOpen)}
                     className="w-full flex items-center justify-between text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide"
                   >
-                    Oferta Innpulsa
+                    OFERTA INNPULSA
                     <ChevronDown size={16} className={`transition-transform ${isOfertaMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isOfertaMenuOpen && (
