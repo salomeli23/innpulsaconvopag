@@ -149,11 +149,13 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
     const allowedTypes = [
       'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel'
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      alert('Solo se permiten archivos PDF y DOCX');
+      alert('Solo se permiten archivos PDF, DOCX, XLSX y XLS');
       e.target.value = '';
       return;
     }
@@ -580,7 +582,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Archivos de Términos de Referencia (PDF/DOCX) - Máximo 15
+                    Archivos de Términos de Referencia (PDF/DOCX/XLSX/XLS) - Máximo 15
                   </label>
                   <div className="space-y-3">
                     {Array.from({ length: 15 }).map((_, index) => {
@@ -639,10 +641,10 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                                 }`}
                               >
                                 <Upload size={16} />
-                                {uploadingFile ? 'Subiendo...' : 'Adjuntar PDF/DOCX'}
+                                {uploadingFile ? 'Subiendo...' : 'Adjuntar Archivo'}
                                 <input
                                   type="file"
-                                  accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
+                                  accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx,application/vnd.ms-excel,.xls"
                                   onChange={(e) => handleFileUpload(e, index)}
                                   disabled={!isEnabled || uploadingFile}
                                   className="hidden"
