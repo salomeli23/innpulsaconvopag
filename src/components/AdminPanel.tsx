@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Convocatoria, ConvocatoriaTerm } from '../types';
-import { Plus, Edit, Trash2, X, Upload, File, Eye, EyeOff } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, X, Upload, File, Eye, EyeOff } from 'lucide-react';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -30,6 +30,8 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     benefits: '',
     terms_url: '',
     is_active: true,
+    no_end_date: false,
+    beneficiaries_count: undefined,
   });
 
   useEffect(() => {
@@ -276,6 +278,8 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       benefits: '',
       is_active: true,
       terms_url: '',
+      no_end_date: false,
+      beneficiaries_count: undefined,
     });
     setEditingId(null);
     setTermFiles([]);
@@ -380,10 +384,11 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                     </label>
                     <input
                       type="date"
-                      required
+                      required={!formData.no_end_date}
+                      disabled={formData.no_end_date}
                       value={formData.end_date?.split('T')[0]}
                       onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                     />
                   </div>
 
@@ -393,10 +398,43 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                     </label>
                     <input
                       type="time"
+                      disabled={formData.no_end_date}
                       value={formData.end_time}
                       onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                     />
+                  </div>
+
+                  <div className="md:col-span-3 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="no_end_date"
+                        checked={formData.no_end_date || false}
+                        onChange={(e) => setFormData({ ...formData, no_end_date: e.target.checked })}
+                        className="w-4 h-4 text-[#CC0C2E] border-gray-300 rounded focus:ring-[#CC0C2E]"
+                      />
+                      <label htmlFor="no_end_date" className="text-sm font-medium text-gray-700">
+                        Sin fecha de cierre (Hasta agotar beneficiarios)
+                      </label>
+                    </div>
+
+                    {formData.no_end_date && (
+                      <div className="ml-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Cantidad de Beneficiarios *
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          required={formData.no_end_date}
+                          value={formData.beneficiaries_count || ''}
+                          onChange={(e) => setFormData({ ...formData, beneficiaries_count: parseInt(e.target.value) || undefined })}
+                          className="w-full md:w-64 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                          placeholder="Ej: 100"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div>

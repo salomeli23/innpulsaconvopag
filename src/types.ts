@@ -29,6 +29,8 @@ export interface Convocatoria {
   benefits?: string;
   terms_url?: string;
   terms?: ConvocatoriaTerm[];
+  no_end_date?: boolean;
+  beneficiaries_count?: number;
 }
 
 export type FilterStatus = 'todas' | 'abierta' | 'cerrada' | 'por-cerrar';

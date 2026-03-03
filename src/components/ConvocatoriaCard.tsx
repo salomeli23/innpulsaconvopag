@@ -44,7 +44,13 @@ export function ConvocatoriaCard({ convocatoria, onClick }: ConvocatoriaCardProp
             {convocatoria.title.toLowerCase()}
           </h3>
           {convocatoria.status === 'abierta' && (
-            <CountdownTimer endDate={convocatoria.end_date} />
+            convocatoria.no_end_date ? (
+              <div className="text-sm font-semibold text-[#CC0C2E]">
+                Hasta agotar beneficiarios ({convocatoria.beneficiaries_count} beneficiarios)
+              </div>
+            ) : (
+              <CountdownTimer endDate={convocatoria.end_date} />
+            )
           )}
         </div>
         <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-4 flex-1">

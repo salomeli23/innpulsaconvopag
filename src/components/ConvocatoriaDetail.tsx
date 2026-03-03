@@ -1,4 +1,4 @@
-import { Calendar, Clock, FileText, Tag, Edit } from 'lucide-react';
+import { Calendar, Clock, FileText, Tag, CreditCard as Edit } from 'lucide-react';
 import { Convocatoria } from '../types';
 
 interface ConvocatoriaDetailProps {
@@ -75,7 +75,14 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
                     <div className="w-12 h-12 bg-[#FF8C00] rounded flex items-center justify-center flex-shrink-0">
                       <Calendar className="text-white" size={20} />
                     </div>
-                    <span className="text-gray-800 text-sm">{formatDate(convocatoria.end_date)}</span>
+                    {convocatoria.no_end_date ? (
+                      <div>
+                        <div className="text-gray-800 text-sm font-semibold">Hasta agotar beneficiarios</div>
+                        <div className="text-gray-600 text-xs mt-1">{convocatoria.beneficiaries_count} beneficiarios</div>
+                      </div>
+                    ) : (
+                      <span className="text-gray-800 text-sm">{formatDate(convocatoria.end_date)}</span>
+                    )}
                   </div>
                 </div>
               </div>
