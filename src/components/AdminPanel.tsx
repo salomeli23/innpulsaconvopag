@@ -147,8 +147,13 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
     const file = files[0];
 
-    if (file.type !== 'application/pdf') {
-      alert('Solo se permiten archivos PDF');
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert('Solo se permiten archivos PDF y DOCX');
       e.target.value = '';
       return;
     }
@@ -575,7 +580,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Archivos de Términos de Referencia (PDF) - Máximo 15
+                    Archivos de Términos de Referencia (PDF/DOCX) - Máximo 15
                   </label>
                   <div className="space-y-3">
                     {Array.from({ length: 15 }).map((_, index) => {
@@ -634,10 +639,10 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                                 }`}
                               >
                                 <Upload size={16} />
-                                {uploadingFile ? 'Subiendo...' : 'Adjuntar PDF'}
+                                {uploadingFile ? 'Subiendo...' : 'Adjuntar PDF/DOCX'}
                                 <input
                                   type="file"
-                                  accept="application/pdf"
+                                  accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
                                   onChange={(e) => handleFileUpload(e, index)}
                                   disabled={!isEnabled || uploadingFile}
                                   className="hidden"
