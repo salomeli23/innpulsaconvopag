@@ -682,7 +682,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
                   Título
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -705,8 +705,10 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             <tbody className="bg-white divide-y divide-gray-200">
               {convocatorias.map((convocatoria) => (
                 <tr key={convocatoria.id} className={!convocatoria.is_active ? 'bg-gray-50' : ''}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{convocatoria.title}</div>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-gray-900 max-w-xs truncate" title={convocatoria.title}>
+                      {convocatoria.title}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
