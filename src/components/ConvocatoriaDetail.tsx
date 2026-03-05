@@ -1,5 +1,7 @@
 import { Calendar, Clock, FileText, Tag, CreditCard as Edit } from 'lucide-react';
-import { Convocatoria } from '../types';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { Convocatoria, ConvocatoriaTerm } from '../types';
 
 interface ConvocatoriaDetailProps {
   convocatoria: Convocatoria;
@@ -7,6 +9,31 @@ interface ConvocatoriaDetailProps {
 }
 
 export default function ConvocatoriaDetail({ convocatoria, onBack }: ConvocatoriaDetailProps) {
+  const [terms, setTerms] = useState<ConvocatoriaTerm[]>([]);
+  const [loadingTerms, setLoadingTerms] = useState(true);
+
+  useEffect(() => {
+    fetchTerms();
+  }, [convocatoria.id]);
+
+  async function fetchTerms() {
+    try {
+      const { data, error } = await supabase
+        .from('convocatoria_terms')
+        .select('*')
+        .eq('convocatoria_id', convocatoria.id)
+        .order('created_at', { ascending: true });
+
+      if (!error && data) {
+        setTerms(data);
+      }
+    } catch (error) {
+      console.error('Error fetching terms:', error);
+    } finally {
+      setLoadingTerms(false);
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-CO', {
@@ -174,7 +201,7 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
             </div>
           )}
 
-          {(convocatoria.terms_url || (convocatoria.terms && convocatoria.terms.length > 0)) && (
+          {(convocatoria.terms_url || terms.length > 0) && (
             <div className="pt-8">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
@@ -198,9 +225,11 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
                     </div>
                   )}
 
-                  {convocatoria.terms && convocatoria.terms.length > 0 && (
+                  {loadingTerms ? (
+                    <div className="text-sm text-gray-600">Cargando documentos...</div>
+                  ) : terms.length > 0 ? (
                     <div className="space-y-2">
-                      {convocatoria.terms.map((term) => (
+                      {terms.map((term) => (
                         <div key={term.id} className="flex items-center gap-2">
                           <FileText className="text-red-600" size={16} />
                           <a
@@ -216,7 +245,7 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
                         </div>
                       ))}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>

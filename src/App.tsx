@@ -58,18 +58,7 @@ function App() {
 
       if (convError) throw convError;
 
-      const { data: termsData, error: termsError } = await supabase
-        .from('convocatoria_terms')
-        .select('*');
-
-      if (termsError) throw termsError;
-
-      const convocatoriasWithTerms = (convocatoriasData || []).map(conv => ({
-        ...conv,
-        terms: (termsData || []).filter(term => term.convocatoria_id === conv.id)
-      }));
-
-      setConvocatorias(convocatoriasWithTerms);
+      setConvocatorias(convocatoriasData || []);
     } catch (error) {
       console.error('Error fetching convocatorias:', error);
     } finally {
