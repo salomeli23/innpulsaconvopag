@@ -41,7 +41,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const fetchConvocatorias = async () => {
     const { data, error } = await supabase
       .from('convocatorias')
-      .select('*')
+      .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries, created_at, updated_at')
       .order('created_at', { ascending: false });
 
     console.log('Fetched convocatorias:', data);
