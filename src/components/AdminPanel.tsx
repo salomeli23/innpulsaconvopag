@@ -682,6 +682,9 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
         )}
 
         <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="p-4 bg-gray-100 border-b">
+            <p className="text-sm text-gray-600">Total de convocatorias: {convocatorias.length}</p>
+          </div>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -706,7 +709,14 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {convocatorias.map((convocatoria) => (
+              {convocatorias.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                    No hay convocatorias disponibles
+                  </td>
+                </tr>
+              ) : (
+                convocatorias.map((convocatoria) => (
                 <tr key={convocatoria.id} className={!convocatoria.is_active ? 'bg-gray-50' : ''}>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900 max-w-xs truncate" title={convocatoria.title}>
@@ -769,7 +779,8 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                     </button>
                   </td>
                 </tr>
-              ))}
+                ))
+              )}
             </tbody>
           </table>
         </div>
