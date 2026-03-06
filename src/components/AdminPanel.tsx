@@ -44,6 +44,9 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       .select('*')
       .order('created_at', { ascending: false });
 
+    console.log('Fetched convocatorias:', data);
+    console.log('Error:', error);
+
     if (!error && data) {
       setConvocatorias(data);
     }
