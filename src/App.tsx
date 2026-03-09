@@ -167,7 +167,7 @@ function App() {
                   </button>
 
                   {isOfertaMenuOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-56 bg-white shadow-lg rounded-md py-2 z-50">
+                    <div className="absolute top-full left-0 mt-2 w-64 bg-white shadow-lg rounded-md py-2 z-50">
                       <a
                         href="https://www.innpulsacolombia.com/convocatorias.html"
                         target="_blank"
@@ -183,6 +183,14 @@ function App() {
                         className="block px-4 py-2 text-xs uppercase tracking-wide text-gray-700 hover:bg-gray-100 transition-colors font-medium"
                       >
                         Aliados
+                      </a>
+                      <a
+                        href="https://www.innpulsacolombia.com/portfolio/fabricas-de-productividad-y-sostenibilidad/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 text-xs uppercase tracking-wide text-gray-700 hover:bg-gray-100 transition-colors font-medium"
+                      >
+                        Fábricas de Productividad y Sostenibilidad
                       </a>
                     </div>
                   )}
@@ -278,6 +286,14 @@ function App() {
                         className="block text-gray-600 hover:text-gray-900 transition-colors py-1 text-sm"
                       >
                         Aliados
+                      </a>
+                      <a
+                        href="https://www.innpulsacolombia.com/portfolio/fabricas-de-productividad-y-sostenibilidad/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-gray-600 hover:text-gray-900 transition-colors py-1 text-sm"
+                      >
+                        Fábricas de Productividad y Sostenibilidad
                       </a>
                     </div>
                   )}
