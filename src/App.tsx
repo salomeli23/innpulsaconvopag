@@ -14,7 +14,6 @@ function App() {
   const [filteredConvocatorias, setFilteredConvocatorias] = useState<Convocatoria[]>([]);
   const [currentFilter, setCurrentFilter] = useState<FilterStatus>('todas');
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedConvocatoria, setSelectedConvocatoria] = useState<Convocatoria | null>(null);
@@ -56,13 +55,14 @@ function App() {
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      if (convError) throw convError;
-
-      setConvocatorias(convocatoriasData || []);
+      if (convError) {
+        console.error('Error fetching convocatorias:', convError);
+      } else {
+        console.log('Fetched convocatorias:', convocatoriasData?.length);
+        setConvocatorias(convocatoriasData || []);
+      }
     } catch (error) {
       console.error('Error fetching convocatorias:', error);
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -333,12 +333,7 @@ function App() {
 
           {/* Cards Grid */}
           <main className="flex-1 min-w-0">
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
-                <p className="mt-4 text-gray-600">Cargando convocatorias...</p>
-              </div>
-            ) : filteredConvocatorias.length === 0 ? (
+            {filteredConvocatorias.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-600">No se encontraron convocatorias.</p>
               </div>
