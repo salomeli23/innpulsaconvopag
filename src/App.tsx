@@ -22,6 +22,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isOfertaMenuOpen, setIsOfertaMenuOpen] = useState(false);
   const [closeTimer, setCloseTimer] = useState<NodeJS.Timeout | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchConvocatorias();
@@ -49,20 +50,25 @@ function App() {
 
   async function fetchConvocatorias() {
     try {
+      setLoading(true);
       const { data: convocatoriasData, error: convError } = await supabase
         .from('convocatorias')
-        .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries, created_at')
+        .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (convError) {
         console.error('Error fetching convocatorias:', convError);
+        console.error('Full error details:', JSON.stringify(convError, null, 2));
       } else {
-        console.log('Fetched convocatorias:', convocatoriasData?.length);
+        console.log('Successfully fetched convocatorias. Count:', convocatoriasData?.length);
+        console.log('Data:', convocatoriasData);
         setConvocatorias(convocatoriasData || []);
       }
     } catch (error) {
-      console.error('Error fetching convocatorias:', error);
+      console.error('Unexpected error fetching convocatorias:', error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -333,9 +339,14 @@ function App() {
 
           {/* Cards Grid */}
           <main className="flex-1 min-w-0">
-            {filteredConvocatorias.length === 0 ? (
+            {loading ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600">Cargando...</p>
+              </div>
+            ) : filteredConvocatorias.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-600">No se encontraron convocatorias.</p>
+                <p className="text-sm text-gray-500 mt-2">Total en base de datos: {convocatorias.length}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
