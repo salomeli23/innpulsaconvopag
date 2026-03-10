@@ -22,9 +22,20 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isOfertaMenuOpen, setIsOfertaMenuOpen] = useState(false);
   const [closeTimer, setCloseTimer] = useState<NodeJS.Timeout | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const cachedData = localStorage.getItem('convocatorias_cache');
+    const cacheTimestamp = localStorage.getItem('convocatorias_cache_timestamp');
+
+    if (cachedData && cacheTimestamp) {
+      const cacheAge = Date.now() - parseInt(cacheTimestamp);
+      const fiveMinutes = 5 * 60 * 1000;
+
+      if (cacheAge < fiveMinutes) {
+        setConvocatorias(JSON.parse(cachedData));
+      }
+    }
+
     fetchConvocatorias();
     checkAuth();
   }, []);
@@ -50,7 +61,6 @@ function App() {
 
   async function fetchConvocatorias() {
     try {
-      setLoading(true);
       const { data: convocatoriasData, error: convError } = await supabase
         .from('convocatorias')
         .select('*')
@@ -63,12 +73,14 @@ function App() {
       } else {
         console.log('Successfully fetched convocatorias. Count:', convocatoriasData?.length);
         console.log('Data:', convocatoriasData);
-        setConvocatorias(convocatoriasData || []);
+        const data = convocatoriasData || [];
+        setConvocatorias(data);
+
+        localStorage.setItem('convocatorias_cache', JSON.stringify(data));
+        localStorage.setItem('convocatorias_cache_timestamp', Date.now().toString());
       }
     } catch (error) {
       console.error('Unexpected error fetching convocatorias:', error);
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -355,11 +367,7 @@ function App() {
 
           {/* Cards Grid */}
           <main className="flex-1 min-w-0">
-            {loading ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">Cargando...</p>
-              </div>
-            ) : filteredConvocatorias.length === 0 ? (
+            {filteredConvocatorias.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-600">No se encontraron convocatorias.</p>
                 <p className="text-sm text-gray-500 mt-2">Total en base de datos: {convocatorias.length}</p>
