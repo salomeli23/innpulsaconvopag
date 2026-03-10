@@ -709,14 +709,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {convocatorias.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    No hay convocatorias disponibles
-                  </td>
-                </tr>
-              ) : (
-                convocatorias.map((convocatoria) => (
+              {convocatorias.map((convocatoria) => (
                 <tr key={convocatoria.id} className={!convocatoria.is_active ? 'bg-gray-50' : ''}>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900 max-w-xs truncate" title={convocatoria.title}>
@@ -780,7 +773,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   </td>
                 </tr>
                 ))
-              )}
+              }
             </tbody>
           </table>
         </div>
