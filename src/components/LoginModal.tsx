@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, RefreshCw } from 'lucide-react';
+import { useState } from 'react';
+import { X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface LoginModalProps {
@@ -8,48 +8,18 @@ interface LoginModalProps {
   onLoginSuccess: () => void;
 }
 
-function generateCaptcha(): { question: string; answer: number } {
-  const num1 = Math.floor(Math.random() * 10) + 1;
-  const num2 = Math.floor(Math.random() * 10) + 1;
-  return {
-    question: `${num1} + ${num2}`,
-    answer: num1 + num2,
-  };
-}
-
 export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [captcha, setCaptcha] = useState(generateCaptcha());
-  const [captchaInput, setCaptchaInput] = useState('');
-
-  useEffect(() => {
-    if (isOpen) {
-      setCaptcha(generateCaptcha());
-      setCaptchaInput('');
-    }
-  }, [isOpen]);
 
   if (!isOpen) return null;
-
-  function refreshCaptcha() {
-    setCaptcha(generateCaptcha());
-    setCaptchaInput('');
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
-    if (parseInt(captchaInput) !== captcha.answer) {
-      setError('CAPTCHA incorrecto. Por favor, intenta de nuevo.');
-      setLoading(false);
-      refreshCaptcha();
-      return;
-    }
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -63,7 +33,6 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
-      refreshCaptcha();
     } finally {
       setLoading(false);
     }
@@ -117,36 +86,6 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
               className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
               placeholder="••••••••"
             />
-          </div>
-
-          <div>
-            <label htmlFor="captcha" className="block text-sm font-medium text-gray-700 mb-1">
-              Verificación
-            </label>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 flex items-center gap-2">
-                <div className="flex items-center justify-center bg-gray-100 border border-gray-300 rounded px-4 py-2 font-mono text-lg font-semibold text-gray-800 min-w-[100px]">
-                  {captcha.question} = ?
-                </div>
-                <input
-                  type="number"
-                  id="captcha"
-                  value={captchaInput}
-                  onChange={(e) => setCaptchaInput(e.target.value)}
-                  required
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
-                  placeholder="Resultado"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={refreshCaptcha}
-                className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded"
-                title="Generar nuevo CAPTCHA"
-              >
-                <RefreshCw size={20} />
-              </button>
-            </div>
           </div>
 
           <button
