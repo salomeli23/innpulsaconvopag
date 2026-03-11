@@ -51,6 +51,11 @@ function App() {
   async function fetchConvocatorias() {
     try {
       setLoading(true);
+
+      // First, auto-close expired convocatorias
+      await supabase.rpc('auto_close_expired_convocatorias');
+
+      // Then fetch the updated data
       const { data: convocatoriasData, error: convError } = await supabase
         .from('convocatorias')
         .select('*')

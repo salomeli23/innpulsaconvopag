@@ -39,6 +39,10 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   }, []);
 
   const fetchConvocatorias = async () => {
+    // First, auto-close expired convocatorias
+    await supabase.rpc('auto_close_expired_convocatorias');
+
+    // Then fetch the updated data
     const { data, error } = await supabase
       .from('convocatorias')
       .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries_count, created_at, updated_at')
