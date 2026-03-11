@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Login - Innpulsa</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 6px;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .log {
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      max-height: 500px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      margin-top: 20px;
+    }
+    .success {
+      color: #22c55e;
+      font-weight: bold;
+    }
+    .error {
+      color: #ef4444;
+      font-weight: bold;
+    }
+    .info {
+      color: #3b82f6;
+    }
+    .warning {
+      color: #f59e0b;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+    }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .status-error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Verificación de Acceso - Sistema Innpulsa</h1>
+    <p class="subtitle">Prueba de autenticación para todos los usuarios</p>
+
+    <div class="test-section">
+      <h3>Acciones de Prueba</h3>
+      <button onclick="testAllUsers()">Probar Todos los Usuarios</button>
+      <button onclick="testAdminUser()">Probar Solo Admin</button>
+      <button onclick="clearLog()">Limpiar Log</button>
+    </div>
+
+    <div id="results"></div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://xpuiytzblbodqdaoxiet.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwdWl5dHpibGJvZHFkYW94aWV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDg3MDU5NzcsImV4cCI6MjAyNDI4MTk3N30.3RdL7Wvs12pSREz_-_MU5LfHO3pNAUGOSqv7VuiXqRk';
+
+    const { createClient } = supabase;
+    const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const users = [
+      { email: 'convocatorias@admin.com', password: 'Admin2026!', role: 'Admin Principal' },
+      { email: 'oscar.uribe@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'sandra.urrea@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'cpalaciosala@gmail.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'cindy.villarraga@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'diana.diaz@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'giovanny.serrano@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'jhony.ruiz@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'julian.rocha@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'juan.sandoval@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'karen.rodriguez@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'karol.chaparro@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'linam.gomez@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'leonardo.perez@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'yenny.florez@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'marlon.castro@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'ruben.gantiva@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'richar.rodriguez@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' },
+      { email: 'jesus.morales@innpulsacolombia.com', password: 'Innpulsa2026!', role: 'Usuario' }
+    ];
+
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      logDiv.innerHTML += `<span class="${type}">[${timestamp}] ${message}</span>\n`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+      document.getElementById('results').innerHTML = '';
+    }
+
+    async function testLogin(email, password) {
+      try {
+        await client.auth.signOut();
+
+        const { data, error } = await client.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        await client.auth.signOut();
+
+        return {
+          success: true,
+          userId: data.user?.id,
+          email: data.user?.email
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: error.message
+        };
+      }
+    }
+
+    async function testAdminUser() {
+      clearLog();
+      log('🔐 PRUEBA DE ACCESO - USUARIO ADMINISTRADOR', 'info');
+      log('═══════════════════════════════════════════════════', 'info');
+
+      const admin = users[0];
+      log(`\n📧 Probando: ${admin.email}`, 'info');
+      log(`🔑 Contraseña: ${admin.password}`, 'info');
+
+      const result = await testLogin(admin.email, admin.password);
+
+      if (result.success) {
+        log(`✅ LOGIN EXITOSO`, 'success');
+        log(`👤 User ID: ${result.userId}`, 'success');
+        log(`📬 Email verificado: ${result.email}`, 'success');
+      } else {
+        log(`❌ LOGIN FALLIDO: ${result.error}`, 'error');
+      }
+
+      displayResults([{ ...admin, ...result }]);
+    }
+
+    async function testAllUsers() {
+      clearLog();
+      log('🔐 INICIANDO PRUEBA DE ACCESO - TODOS LOS USUARIOS', 'info');
+      log('═══════════════════════════════════════════════════', 'info');
+      log(`📊 Total de usuarios a probar: ${users.length}\n`, 'info');
+
+      const results = [];
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const user of users) {
+        log(`\n📧 Probando: ${user.email}`, 'info');
+
+        const result = await testLogin(user.email, user.password);
+
+        if (result.success) {
+          log(`✅ Acceso correcto`, 'success');
+          successCount++;
+        } else {
+          log(`❌ Error: ${result.error}`, 'error');
+          errorCount++;
+        }
+
+        results.push({ ...user, ...result });
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      log('\n═══════════════════════════════════════════════════', 'info');
+      log('📈 RESUMEN FINAL DE PRUEBAS', 'info');
+      log('═══════════════════════════════════════════════════', 'info');
+      log(`✅ Accesos exitosos: ${successCount}/${users.length}`, 'success');
+      log(`❌ Accesos fallidos: ${errorCount}/${users.length}`, errorCount > 0 ? 'error' : 'info');
+      log(`📊 Tasa de éxito: ${((successCount/users.length)*100).toFixed(1)}%`, 'info');
+
+      displayResults(results);
+    }
+
+    function displayResults(results) {
+      const resultsDiv = document.getElementById('results');
+
+      let html = '<h3 style="margin-top: 30px;">Resultados de las Pruebas</h3>';
+      html += '<table>';
+      html += '<thead><tr>';
+      html += '<th>Email</th>';
+      html += '<th>Rol</th>';
+      html += '<th>Estado</th>';
+      html += '<th>Detalles</th>';
+      html += '</tr></thead>';
+      html += '<tbody>';
+
+      results.forEach(result => {
+        html += '<tr>';
+        html += `<td>${result.email}</td>`;
+        html += `<td>${result.role}</td>`;
+
+        if (result.success) {
+          html += '<td><span class="status-badge status-success">✓ Acceso OK</span></td>';
+          html += `<td style="color: #065f46; font-size: 12px;">User ID: ${result.userId?.substring(0, 8)}...</td>`;
+        } else {
+          html += '<td><span class="status-badge status-error">✗ Error</span></td>';
+          html += `<td style="color: #991b1b; font-size: 12px;">${result.error}</td>`;
+        }
+
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      resultsDiv.innerHTML = html;
+    }
+
+    log('✅ Sistema de pruebas listo', 'success');
+    log('💡 Haz clic en un botón para comenzar las pruebas', 'info');
+  </script>
+</body>
+</html>
