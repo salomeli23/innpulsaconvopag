@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Usuarios Administrativos - Innpulsa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-6">Crear Usuarios Administrativos</h1>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Contraseña para todos los usuarios:
+        </label>
+        <input
+          type="text"
+          id="password"
+          value="InnpulsaColombia2026!"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 focus:border-transparent"
+        />
+        <p class="mt-2 text-sm text-gray-500">Esta contraseña se asignará a todos los usuarios listados abajo.</p>
+      </div>
+
+      <button
+        onclick="createAllUsers()"
+        class="mb-6 px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
+      >
+        Crear Todos los Usuarios
+      </button>
+
+      <div id="results" class="space-y-2"></div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://xpuiytzblbodqdaoxiet.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwdWl5dHpibGJvZHFkYW94aWV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NjI5ODMsImV4cCI6MjA4NzQzODk4M30.8mBvr-kwAUoWBtvnuHRcYYj7cFPHZwhFSraJlqOHtzc';
+
+    const users = [
+      'yenny.florez@innpulsacolombia.com',
+      'marlon.castro@innpulsacolombia.com',
+      'ruben.gantiva@innpulsacolombia.com',
+      'richar.rodriguez@innpulsacolombia.com',
+      'jesus.morales@innpulsacolombia.com',
+      'cpalaciosala@gmail.com',
+      'cindy.villarraga@innpulsacolombia.com',
+      'diana.diaz@innpulsacolombia.com',
+      'giovanny.serrano@innpulsacolombia.com',
+      'jhony.ruiz@innpulsacolombia.com',
+      'julian.rocha@innpulsacolombia.com',
+      'juan.sandoval@innpulsacolombia.com',
+      'karen.rodriguez@innpulsacolombia.com',
+      'karol.chaparro@innpulsacolombia.com',
+      'linam.gomez@innpulsacolombia.com',
+      'leonardo.perez@innpulsacolombia.com'
+    ];
+
+    async function createUser(email, password) {
+      const resultsDiv = document.getElementById('results');
+      const resultItem = document.createElement('div');
+      resultItem.className = 'p-4 rounded-lg border';
+      resultItem.innerHTML = `
+        <div class="flex items-center">
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-3"></div>
+          <span class="text-gray-700">${email} - Creando...</span>
+        </div>
+      `;
+      resultsDiv.appendChild(resultItem);
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-admin-users`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          resultItem.className = 'p-4 rounded-lg border border-green-300 bg-green-50';
+          resultItem.innerHTML = `
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-green-800 font-medium">${email} - Creado exitosamente</span>
+            </div>
+          `;
+        } else {
+          throw new Error(data.error || 'Error desconocido');
+        }
+      } catch (error) {
+        resultItem.className = 'p-4 rounded-lg border border-red-300 bg-red-50';
+        resultItem.innerHTML = `
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+              <span class="text-red-800 font-medium">${email} - Error</span>
+              <p class="text-sm text-red-600 mt-1">${error.message}</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function createAllUsers() {
+      const password = document.getElementById('password').value;
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+
+      if (!password) {
+        alert('Por favor ingresa una contraseña');
+        return;
+      }
+
+      for (const email of users) {
+        await createUser(email, password);
+        // Small delay between requests
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+  </script>
+</body>
+</html>
