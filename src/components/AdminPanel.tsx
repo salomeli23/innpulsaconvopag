@@ -1,14 +1,28 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Convocatoria, ConvocatoriaTerm } from '../types';
-import { Plus, CreditCard as Edit, Trash2, X, Upload, File, Eye, EyeOff } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, X, Upload, File, Eye, EyeOff, Users } from 'lucide-react';
 
 interface AdminPanelProps {
   onLogout: () => void;
 }
 
+interface AdminUser {
+  id: string;
+  email: string;
+  created_at: string;
+  last_sign_in_at: string | null;
+}
+
 export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([]);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'convocatorias' | 'users'>('convocatorias');
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [creatingUser, setCreatingUser] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [termFiles, setTermFiles] = useState<ConvocatoriaTerm[]>([]);
@@ -36,7 +50,139 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
   useEffect(() => {
     fetchConvocatorias();
+    fetchCurrentUser();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'users' && currentUserEmail === 'convocatorias@innpulsa.com') {
+      fetchUsers();
+    }
+  }, [activeTab, currentUserEmail]);
+
+  const fetchCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      setCurrentUserEmail(user.email);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase.auth.admin.listUsers();
+      if (error) {
+        console.error('Error fetching users:', error);
+        return;
+      }
+
+      const formattedUsers: AdminUser[] = data.users.map(user => ({
+        id: user.id,
+        email: user.email || '',
+        created_at: user.created_at,
+        last_sign_in_at: user.last_sign_in_at,
+      }));
+
+      setUsers(formattedUsers);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newUserEmail || !newUserPassword) {
+      alert('Por favor ingresa email y contraseña');
+      return;
+    }
+
+    setCreatingUser(true);
+
+    try {
+      const { data, error } = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-admin-users`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            users: [{ email: newUserEmail, password: newUserPassword }],
+            adminKey: 'innpulsa2026'
+          }),
+        }
+      ).then(res => res.json());
+
+      if (error) {
+        alert(`Error: ${error}`);
+      } else {
+        alert('Usuario creado exitosamente');
+        setNewUserEmail('');
+        setNewUserPassword('');
+        setShowUserForm(false);
+        fetchUsers();
+      }
+    } catch (error) {
+      alert('Error al crear usuario: ' + error);
+    } finally {
+      setCreatingUser(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, email: string) => {
+    if (!confirm(`¿Estás seguro de eliminar el usuario ${email}?`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.admin.deleteUser(userId);
+
+      if (error) {
+        alert('Error al eliminar usuario: ' + error.message);
+      } else {
+        alert('Usuario eliminado exitosamente');
+        fetchUsers();
+      }
+    } catch (error) {
+      alert('Error al eliminar usuario');
+    }
+  };
+
+  const handleResetPassword = async (email: string) => {
+    const newPassword = prompt(`Ingresa la nueva contraseña para ${email}:`);
+
+    if (!newPassword) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reset-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            email,
+            newPassword,
+            adminKey: 'innpulsa2026'
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.error) {
+        alert(`Error: ${data.error}`);
+      } else {
+        alert('Contraseña actualizada exitosamente');
+      }
+    } catch (error) {
+      alert('Error al resetear contraseña');
+    }
+  };
 
   const fetchConvocatorias = async () => {
     try {
@@ -307,11 +453,40 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setShowForm(false);
   };
 
+  const isSuperAdmin = currentUserEmail === 'convocatorias@innpulsa.com';
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Panel de Administración</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold text-gray-900">Panel de Administración</h1>
+            {isSuperAdmin && (
+              <div className="flex gap-2 border-l border-gray-300 pl-4">
+                <button
+                  onClick={() => setActiveTab('convocatorias')}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    activeTab === 'convocatorias'
+                      ? 'bg-[#CC0C2E] text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Convocatorias
+                </button>
+                <button
+                  onClick={() => setActiveTab('users')}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
+                    activeTab === 'users'
+                      ? 'bg-[#CC0C2E] text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  <Users size={16} />
+                  Usuarios
+                </button>
+              </div>
+            )}
+          </div>
           <button
             onClick={onLogout}
             className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
@@ -322,15 +497,17 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-[#CC0C2E] text-white rounded-lg hover:bg-[#A00A25] transition-colors"
-          >
-            <Plus size={20} />
-            Nueva Convocatoria
-          </button>
-        </div>
+        {activeTab === 'convocatorias' && (
+          <>
+            <div className="mb-6">
+              <button
+                onClick={() => setShowForm(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-[#CC0C2E] text-white rounded-lg hover:bg-[#A00A25] transition-colors"
+              >
+                <Plus size={20} />
+                Nueva Convocatoria
+              </button>
+            </div>
 
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 overflow-y-auto">
@@ -692,11 +869,11 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-4 bg-gray-100 border-b">
-            <p className="text-sm text-gray-600">Total de convocatorias: {convocatorias.length}</p>
-          </div>
-          <table className="min-w-full divide-y divide-gray-200">
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="p-4 bg-gray-100 border-b">
+                <p className="text-sm text-gray-600">Total de convocatorias: {convocatorias.length}</p>
+              </div>
+              <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
@@ -785,9 +962,148 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                 </tr>
                 ))
               }
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
+          </>
+        )}
+
+        {activeTab === 'users' && isSuperAdmin && (
+          <>
+            <div className="mb-6">
+              <button
+                onClick={() => setShowUserForm(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-[#CC0C2E] text-white rounded-lg hover:bg-[#A00A25] transition-colors"
+              >
+                <Plus size={20} />
+                Crear Usuario
+              </button>
+            </div>
+
+            {showUserForm && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="bg-white rounded-lg p-8 w-full max-w-md">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900">Crear Usuario</h2>
+                    <button
+                      onClick={() => setShowUserForm(false)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X size={24} />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleCreateUser} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={newUserEmail}
+                        onChange={(e) => setNewUserEmail(e.target.value)}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                        placeholder="usuario@innpulsa.com"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Contraseña *
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={newUserPassword}
+                        onChange={(e) => setNewUserPassword(e.target.value)}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
+                        placeholder="Mínimo 8 caracteres"
+                        minLength={8}
+                      />
+                    </div>
+
+                    <div className="flex gap-4 pt-4">
+                      <button
+                        type="submit"
+                        disabled={creatingUser}
+                        className="flex-1 px-6 py-3 bg-[#CC0C2E] text-white font-medium rounded-lg hover:bg-[#A00A25] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {creatingUser ? 'Creando...' : 'Crear Usuario'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowUserForm(false)}
+                        className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="p-4 bg-gray-100 border-b">
+                <p className="text-sm text-gray-600">Total de usuarios: {users.length}</p>
+              </div>
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha de Creación
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Último Acceso
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {users.map((user) => (
+                    <tr key={user.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{user.email}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(user.created_at).toLocaleDateString('es-CO')}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {user.last_sign_in_at
+                          ? new Date(user.last_sign_in_at).toLocaleDateString('es-CO')
+                          : 'Nunca'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => handleResetPassword(user.email)}
+                          className="text-blue-600 hover:text-blue-900 mr-3"
+                          title="Resetear contraseña"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        {user.email !== currentUserEmail && (
+                          <button
+                            onClick={() => handleDeleteUser(user.id, user.email)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Eliminar usuario"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
