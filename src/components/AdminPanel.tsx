@@ -39,17 +39,24 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   }, []);
 
   const fetchConvocatorias = async () => {
-    // First, auto-close expired convocatorias
-    await supabase.rpc('auto_close_expired_convocatorias');
+    try {
+      // Try to auto-close expired convocatorias (ignore errors)
+      await supabase.rpc('auto_close_expired_convocatorias').catch(err => {
+        console.log('Auto-close function skipped:', err);
+      });
+    } catch (e) {
+      // Silent fail - not critical
+    }
 
-    // Then fetch the updated data
+    // Fetch the updated data
     const { data, error } = await supabase
       .from('convocatorias')
       .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries_count, created_at, updated_at')
       .order('created_at', { ascending: false });
 
-    console.log('Fetched convocatorias:', data);
-    console.log('Error:', error);
+    if (error) {
+      console.error('Error fetching convocatorias:', error);
+    }
 
     if (!error && data) {
       setConvocatorias(data);
