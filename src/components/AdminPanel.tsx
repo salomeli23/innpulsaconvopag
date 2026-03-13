@@ -54,7 +54,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'users' && currentUserEmail === 'convocatorias@innpulsa.com') {
+    if (activeTab === 'users' && currentUserEmail === 'convocatorias@admin.com') {
       fetchUsers();
     }
   }, [activeTab, currentUserEmail]);
@@ -453,7 +453,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setShowForm(false);
   };
 
-  const isSuperAdmin = currentUserEmail === 'convocatorias@innpulsa.com';
+  const isSuperAdmin = currentUserEmail === 'convocatorias@admin.com';
 
   return (
     <div className="min-h-screen bg-gray-50">
