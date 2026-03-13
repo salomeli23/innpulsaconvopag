@@ -6,9 +6,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-interface CreateUserRequest {
-  usuario: string;
+interface UserData {
+  email: string;
   password: string;
+}
+
+interface CreateUsersRequest {
+  users: UserData[];
+  adminKey: string;
 }
 
 Deno.serve(async (req: Request) => {
@@ -20,6 +25,29 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    const { users, adminKey }: CreateUsersRequest = await req.json();
+
+    // Verify admin key
+    if (adminKey !== 'innpulsa2026') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid admin key' }),
+        {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    if (!users || !Array.isArray(users) || users.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Users array is required' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
     // Create Supabase admin client using service role key
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -32,87 +60,70 @@ Deno.serve(async (req: Request) => {
       }
     );
 
-    const { usuario, password }: CreateUserRequest = await req.json();
+    const results = [];
 
-    if (!usuario || !password) {
-      return new Response(
-        JSON.stringify({ error: 'Usuario and password are required' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
+    for (const userData of users) {
+      const { email, password } = userData;
 
-    const email = usuario.includes('@') ? usuario : `${usuario}@innpulsacolombia.com`;
-
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const existingUser = existingUsers?.users.find(u => u.email === email);
-
-    if (existingUser) {
-      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        existingUser.id,
-        { password: password }
-      );
-
-      if (updateError) {
-        return new Response(
-          JSON.stringify({ error: `User exists but password update failed: ${updateError.message}` }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+      if (!email || !password) {
+        results.push({
+          email: email || 'unknown',
+          success: false,
+          error: 'Email and password are required'
+        });
+        continue;
       }
 
-      return new Response(
-        JSON.stringify({
+      // Check if user already exists
+      const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+      const existingUser = existingUsers?.users.find(u => u.email === email);
+
+      if (existingUser) {
+        results.push({
+          email,
+          success: false,
+          error: 'User already exists'
+        });
+        continue;
+      }
+
+      // Create new user
+      const { data, error } = await supabaseAdmin.auth.admin.createUser({
+        email: email,
+        password: password,
+        email_confirm: true,
+      });
+
+      if (error) {
+        results.push({
+          email,
+          success: false,
+          error: error.message
+        });
+      } else {
+        results.push({
+          email,
           success: true,
-          message: 'User already exists, password updated',
-          user: {
-            id: existingUser.id,
-            email: existingUser.email
-          }
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
+          user_id: data.user?.id
+        });
+      }
     }
 
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
-      email: email,
-      password: password,
-      email_confirm: true,
-    });
-
-    if (error) {
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
+    const allSuccessful = results.every(r => r.success);
 
     return new Response(
       JSON.stringify({
-        success: true,
-        user: {
-          id: data.user?.id,
-          email: data.user?.email
-        }
+        success: allSuccessful,
+        results
       }),
       {
-        status: 200,
+        status: allSuccessful ? 200 : 207, // 207 Multi-Status for partial success
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
 
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error('Error creating users:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Internal server error' }),
       {

@@ -98,7 +98,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setCreatingUser(true);
 
     try {
-      const { data, error } = await fetch(
+      const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-admin-users`,
         {
           method: 'POST',
@@ -111,10 +111,23 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             adminKey: 'innpulsa2026'
           }),
         }
-      ).then(res => res.json());
+      );
 
-      if (error) {
-        alert(`Error: ${error}`);
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        alert(`Error: ${data.error || 'Error desconocido'}`);
+      } else if (data.results && data.results[0]) {
+        const result = data.results[0];
+        if (result.success) {
+          alert('Usuario creado exitosamente');
+          setNewUserEmail('');
+          setNewUserPassword('');
+          setShowUserForm(false);
+          fetchUsers();
+        } else {
+          alert(`Error: ${result.error}`);
+        }
       } else {
         alert('Usuario creado exitosamente');
         setNewUserEmail('');
@@ -123,6 +136,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
         fetchUsers();
       }
     } catch (error) {
+      console.error('Error al crear usuario:', error);
       alert('Error al crear usuario: ' + error);
     } finally {
       setCreatingUser(false);
