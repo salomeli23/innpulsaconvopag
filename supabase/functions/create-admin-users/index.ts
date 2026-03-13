@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface CreateUserRequest {
-  email: string;
+  usuario: string;
   password: string;
 }
 
@@ -32,17 +32,19 @@ Deno.serve(async (req: Request) => {
       }
     );
 
-    const { email, password }: CreateUserRequest = await req.json();
+    const { usuario, password }: CreateUserRequest = await req.json();
 
-    if (!email || !password) {
+    if (!usuario || !password) {
       return new Response(
-        JSON.stringify({ error: 'Email and password are required' }),
+        JSON.stringify({ error: 'Usuario and password are required' }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
     }
+
+    const email = usuario.includes('@') ? usuario : `${usuario}@innpulsacolombia.com`;
 
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
     const existingUser = existingUsers?.users.find(u => u.email === email);
