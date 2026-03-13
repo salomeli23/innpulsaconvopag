@@ -68,13 +68,28 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase.auth.admin.listUsers();
-      if (error) {
-        console.error('Error fetching users:', error);
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/list-admin-users`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            adminKey: 'innpulsa2026'
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        console.error('Error fetching users:', data.error);
         return;
       }
 
-      const formattedUsers: AdminUser[] = data.users.map(user => ({
+      const formattedUsers: AdminUser[] = data.users.map((user: any) => ({
         id: user.id,
         email: user.email || '',
         created_at: user.created_at,
@@ -149,15 +164,31 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     }
 
     try {
-      const { error } = await supabase.auth.admin.deleteUser(userId);
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-admin-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            userId,
+            adminKey: 'innpulsa2026'
+          }),
+        }
+      );
 
-      if (error) {
-        alert('Error al eliminar usuario: ' + error.message);
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        alert('Error al eliminar usuario: ' + (data.error || 'Error desconocido'));
       } else {
         alert('Usuario eliminado exitosamente');
         fetchUsers();
       }
     } catch (error) {
+      console.error('Error al eliminar usuario:', error);
       alert('Error al eliminar usuario');
     }
   };
