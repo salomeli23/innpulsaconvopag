@@ -27,6 +27,15 @@ function App() {
   useEffect(() => {
     fetchConvocatorias();
     checkAuth();
+
+    // Listen to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   async function checkAuth() {
@@ -52,10 +61,7 @@ function App() {
     try {
       setLoading(true);
 
-      // First, auto-close expired convocatorias
-      await supabase.rpc('auto_close_expired_convocatorias');
-
-      // Then fetch the updated data
+      // Fetch convocatorias data
       const { data: convocatoriasData, error: convError } = await supabase
         .from('convocatorias')
         .select('*')
@@ -64,10 +70,7 @@ function App() {
 
       if (convError) {
         console.error('Error fetching convocatorias:', convError);
-        console.error('Full error details:', JSON.stringify(convError, null, 2));
       } else {
-        console.log('Successfully fetched convocatorias. Count:', convocatoriasData?.length);
-        console.log('Data:', convocatoriasData);
         setConvocatorias(convocatoriasData || []);
       }
     } catch (error) {
