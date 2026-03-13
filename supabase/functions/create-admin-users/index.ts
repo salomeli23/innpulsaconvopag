@@ -44,11 +44,45 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Create user with admin client
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const existingUser = existingUsers?.users.find(u => u.email === email);
+
+    if (existingUser) {
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+        existingUser.id,
+        { password: password }
+      );
+
+      if (updateError) {
+        return new Response(
+          JSON.stringify({ error: `User exists but password update failed: ${updateError.message}` }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'User already exists, password updated',
+          user: {
+            id: existingUser.id,
+            email: existingUser.email
+          }
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email: email,
       password: password,
-      email_confirm: true, // Auto-confirm email
+      email_confirm: true,
     });
 
     if (error) {
