@@ -532,7 +532,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setShowForm(false);
   };
 
-  const isSuperAdmin = currentUserEmail === 'convocatorias@admin.com';
+  const isSuperAdmin = currentUserEmail === 'convocatorias@admin.com' || currentUserEmail === 'karen.rodriguez@admin.com';
 
   return (
     <div className="min-h-screen bg-gray-50">
