@@ -18,6 +18,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedConvocatoria, setSelectedConvocatoria] = useState<Convocatoria | null>(null);
   const [showAliados, setShowAliados] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isOfertaMenuOpen, setIsOfertaMenuOpen] = useState(false);
@@ -127,8 +128,8 @@ function App() {
     );
   }
 
-  if (isAuthenticated) {
-    return <AdminPanel onLogout={handleLogout} />;
+  if (showAdminPanel && isAuthenticated) {
+    return <AdminPanel onLogout={handleLogout} onBack={() => setShowAdminPanel(false)} />;
   }
 
   if (showAliados) {
@@ -232,13 +233,24 @@ function App() {
 
               {/* Right Side - Icons and Logo */}
               <div className="flex items-center space-x-3 sm:space-x-4 lg:space-x-6 ml-auto">
-                <button
-                  onClick={() => setIsLoginModalOpen(true)}
-                  className="text-gray-600 hover:text-gray-800 transition-colors p-2"
-                  aria-label="Login"
-                >
-                  <User size={20} />
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => setShowAdminPanel(true)}
+                    className="text-gray-600 hover:text-gray-800 transition-colors p-2 flex items-center gap-2"
+                    aria-label="Admin Panel"
+                  >
+                    <User size={20} />
+                    <span className="hidden lg:inline text-sm">Panel</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setIsLoginModalOpen(true)}
+                    className="text-gray-600 hover:text-gray-800 transition-colors p-2"
+                    aria-label="Login"
+                  >
+                    <User size={20} />
+                  </button>
+                )}
                 <button className="hidden sm:block text-gray-600 hover:text-gray-800 transition-colors p-2" aria-label="Search">
                   <Search size={20} />
                 </button>
@@ -330,6 +342,17 @@ function App() {
                 >
                   Registro Único
                 </a>
+                {isAuthenticated && (
+                  <button
+                    onClick={() => {
+                      setShowAdminPanel(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide"
+                  >
+                    Panel de Administración
+                  </button>
+                )}
                 <a href="https://www.innpulsacolombia.com/escribenos/" target="_blank" rel="noopener noreferrer" className="block text-gray-700 hover:text-gray-900 font-medium transition-colors py-2 text-sm uppercase tracking-wide">Contacto</a>
               </nav>
             </div>
