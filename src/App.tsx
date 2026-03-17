@@ -63,11 +63,10 @@ function App() {
     try {
       setLoading(true);
 
+      // Use materialized view for faster queries
       const { data: convocatoriasData, error: convError } = await supabase
-        .from('convocatorias')
-        .select('id, title, description, status, start_date, end_date, category, created_at, updated_at, is_active, target_audience, purpose, benefits, registration_url, beneficiaries_count, no_end_date')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .from('active_convocatorias_view')
+        .select('*');
 
       if (convError) {
         console.error('Error fetching convocatorias:', convError);

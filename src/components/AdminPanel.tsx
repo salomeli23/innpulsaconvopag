@@ -304,11 +304,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       if (data) {
         setConvocatorias(data);
       }
-
-      // Run auto-close in background after data is loaded
-      supabase.rpc('auto_close_expired_convocatorias').catch(err => {
-        console.log('Auto-close skipped:', err);
-      });
     } catch (e) {
       console.error('Unexpected error:', e);
     } finally {
