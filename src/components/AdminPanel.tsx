@@ -61,7 +61,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'users' && currentUserEmail === 'convocatorias@admin.com') {
+    if (activeTab === 'users' && (currentUserEmail === 'convocatorias@admin.com' || currentUserEmail === 'karen.rodriguez@innpulsacolombia.com')) {
       fetchUsers();
     }
   }, [activeTab, currentUserEmail]);
@@ -532,7 +532,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setShowForm(false);
   };
 
-  const isSuperAdmin = currentUserEmail === 'convocatorias@admin.com' || currentUserEmail === 'karen.rodriguez@admin.com';
+  const isSuperAdmin = currentUserEmail === 'convocatorias@admin.com' || currentUserEmail === 'karen.rodriguez@innpulsacolombia.com';
 
   return (
     <div className="min-h-screen bg-gray-50">
