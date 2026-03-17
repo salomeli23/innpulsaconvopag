@@ -584,16 +584,18 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
               </button>
               <button
                 onClick={() => exportToExcel(convocatorias)}
-                className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                title="Exportar a Excel (CSV)"
+                disabled
+                className="flex items-center gap-2 px-6 py-3 bg-gray-400 text-white rounded-lg cursor-not-allowed opacity-50"
+                title="Exportar a Excel (CSV) - Deshabilitado"
               >
                 <FileSpreadsheet size={20} />
                 Exportar Excel
               </button>
               <button
                 onClick={() => exportToSQL(convocatorias)}
-                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                title="Exportar a SQL"
+                disabled
+                className="flex items-center gap-2 px-6 py-3 bg-gray-400 text-white rounded-lg cursor-not-allowed opacity-50"
+                title="Exportar a SQL - Deshabilitado"
               >
                 <Database size={20} />
                 Exportar SQL
