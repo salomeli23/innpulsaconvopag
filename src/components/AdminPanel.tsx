@@ -25,8 +25,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [newUserPassword, setNewUserPassword] = useState('');
   const [creatingUser, setCreatingUser] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [loadingConvocatorias, setLoadingConvocatorias] = useState(true);
-  const [initializing, setInitializing] = useState(true);
   const [confirmationModal, setConfirmationModal] = useState<{
     show: boolean;
     type: 'success' | 'error';
@@ -58,17 +56,8 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   });
 
   useEffect(() => {
-    // Fetch user first, then convocatorias in parallel
-    const initializePanel = async () => {
-      try {
-        const userPromise = fetchCurrentUser();
-        const convoPromise = fetchConvocatorias();
-        await Promise.all([userPromise, convoPromise]);
-      } finally {
-        setInitializing(false);
-      }
-    };
-    initializePanel();
+    fetchConvocatorias();
+    fetchCurrentUser();
   }, []);
 
   useEffect(() => {
@@ -275,39 +264,27 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   };
 
   const fetchConvocatorias = async () => {
-    setLoadingConvocatorias(true);
-
     try {
-      // Fetch the data immediately without waiting for auto-close
-      const { data, error } = await supabase
-        .from('convocatorias')
-        .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries_count, created_at, updated_at')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching convocatorias:', error);
-        // Retry once after 1 second if failed
-        setTimeout(async () => {
-          const { data: retryData } = await supabase
-            .from('convocatorias')
-            .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries_count, created_at, updated_at')
-            .order('created_at', { ascending: false });
-
-          if (retryData) {
-            setConvocatorias(retryData);
-          }
-          setLoadingConvocatorias(false);
-        }, 1000);
-        return;
-      }
-
-      if (data) {
-        setConvocatorias(data);
-      }
+      // Try to auto-close expired convocatorias (ignore errors)
+      await supabase.rpc('auto_close_expired_convocatorias').catch(err => {
+        console.log('Auto-close function skipped:', err);
+      });
     } catch (e) {
-      console.error('Unexpected error:', e);
-    } finally {
-      setLoadingConvocatorias(false);
+      // Silent fail - not critical
+    }
+
+    // Fetch the updated data
+    const { data, error } = await supabase
+      .from('convocatorias')
+      .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries_count, created_at, updated_at')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching convocatorias:', error);
+    }
+
+    if (!error && data) {
+      setConvocatorias(data);
     }
   };
 
@@ -556,17 +533,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   };
 
   const isSuperAdmin = currentUserEmail === 'convocatorias@admin.com' || currentUserEmail === 'karen.rodriguez@innpulsacolombia.com';
-
-  if (initializing) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#CC0C2E]"></div>
-          <p className="text-gray-600">Cargando panel de administración...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1002,17 +968,8 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
         )}
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="p-4 bg-gray-100 border-b flex justify-between items-center">
+              <div className="p-4 bg-gray-100 border-b">
                 <p className="text-sm text-gray-600">Total de convocatorias: {convocatorias.length}</p>
-                <button
-                  onClick={fetchConvocatorias}
-                  disabled={loadingConvocatorias}
-                  className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  title="Recargar convocatorias"
-                >
-                  <Database size={16} className={loadingConvocatorias ? 'animate-spin' : ''} />
-                  {loadingConvocatorias ? 'Cargando...' : 'Recargar'}
-                </button>
               </div>
               <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -1038,23 +995,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {loadingConvocatorias ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center gap-3">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#CC0C2E]"></div>
-                      <p className="text-sm text-gray-600">Cargando convocatorias...</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : convocatorias.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <p className="text-sm text-gray-500">No hay convocatorias registradas</p>
-                  </td>
-                </tr>
-              ) : (
-                convocatorias.map((convocatoria) => (
+              {convocatorias.map((convocatoria) => (
                 <tr key={convocatoria.id} className={!convocatoria.is_active ? 'bg-gray-50' : ''}>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900 max-w-xs truncate" title={convocatoria.title}>
@@ -1118,7 +1059,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   </td>
                 </tr>
                 ))
-              )}
+              }
               </tbody>
             </table>
           </div>
