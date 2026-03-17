@@ -47,8 +47,9 @@ Deno.serve(async (req: Request) => {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers();
 
     if (error) {
+      console.error('Database error:', error);
       return new Response(
-        JSON.stringify({ error: error.message }),
+        JSON.stringify({ error: `Database error finding users: ${error.message}` }),
         {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
