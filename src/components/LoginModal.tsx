@@ -22,27 +22,17 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
         password,
       });
 
-      if (error) {
-        console.error('Login error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      if (data.session) {
-        onLoginSuccess();
-        onClose();
-        setEmail('');
-        setPassword('');
-      }
+      onLoginSuccess();
+      onClose();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al iniciar sesión';
-      setError(errorMessage === 'Invalid login credentials'
-        ? 'Credenciales incorrectas. Verifica tu correo y contraseña.'
-        : errorMessage);
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }

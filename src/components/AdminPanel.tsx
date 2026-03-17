@@ -23,11 +23,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
   const [creatingUser, setCreatingUser] = useState(false);
-  const [confirmationModal, setConfirmationModal] = useState<{
-    show: boolean;
-    type: 'success' | 'error';
-    message: string;
-  }>({ show: false, type: 'success', message: '' });
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [termFiles, setTermFiles] = useState<ConvocatoriaTerm[]>([]);
@@ -111,11 +106,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     e.preventDefault();
 
     if (!newUserEmail || !newUserPassword) {
-      setConfirmationModal({
-        show: true,
-        type: 'error',
-        message: 'Por favor ingresa email y contraseña'
-      });
+      alert('Por favor ingresa email y contraseña');
       return;
     }
 
@@ -140,36 +131,20 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       const data = await response.json();
 
       if (!response.ok || data.error) {
-        setConfirmationModal({
-          show: true,
-          type: 'error',
-          message: data.error || 'Error desconocido'
-        });
+        alert(`Error: ${data.error || 'Error desconocido'}`);
       } else if (data.results && data.results[0]) {
         const result = data.results[0];
         if (result.success) {
-          setConfirmationModal({
-            show: true,
-            type: 'success',
-            message: `Usuario ${newUserEmail} creado exitosamente`
-          });
+          alert('Usuario creado exitosamente');
           setNewUserEmail('');
           setNewUserPassword('');
           setShowUserForm(false);
           fetchUsers();
         } else {
-          setConfirmationModal({
-            show: true,
-            type: 'error',
-            message: result.error
-          });
+          alert(`Error: ${result.error}`);
         }
       } else {
-        setConfirmationModal({
-          show: true,
-          type: 'success',
-          message: `Usuario ${newUserEmail} creado exitosamente`
-        });
+        alert('Usuario creado exitosamente');
         setNewUserEmail('');
         setNewUserPassword('');
         setShowUserForm(false);
@@ -177,11 +152,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       }
     } catch (error) {
       console.error('Error al crear usuario:', error);
-      setConfirmationModal({
-        show: true,
-        type: 'error',
-        message: 'Error al crear usuario: ' + error
-      });
+      alert('Error al crear usuario: ' + error);
     } finally {
       setCreatingUser(false);
     }
@@ -1179,45 +1150,6 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
           </>
         )}
       </div>
-
-      {confirmationModal.show && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-2xl">
-            <div className="flex flex-col items-center">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-                confirmationModal.type === 'success' ? 'bg-green-100' : 'bg-red-100'
-              }`}>
-                {confirmationModal.type === 'success' ? (
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                ) : (
-                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                )}
-              </div>
-
-              <h3 className={`text-xl font-bold mb-2 ${
-                confirmationModal.type === 'success' ? 'text-green-900' : 'text-red-900'
-              }`}>
-                {confirmationModal.type === 'success' ? 'Operación Exitosa' : 'Error'}
-              </h3>
-
-              <p className="text-gray-700 text-center mb-6">
-                {confirmationModal.message}
-              </p>
-
-              <button
-                onClick={() => setConfirmationModal({ show: false, type: 'success', message: '' })}
-                className="px-6 py-2.5 bg-[#CC0C2E] text-white font-medium rounded-lg hover:bg-[#A00A25] transition-colors"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
