@@ -26,6 +26,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [creatingUser, setCreatingUser] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [loadingConvocatorias, setLoadingConvocatorias] = useState(true);
+  const [initializing, setInitializing] = useState(true);
   const [confirmationModal, setConfirmationModal] = useState<{
     show: boolean;
     type: 'success' | 'error';
@@ -57,8 +58,17 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   });
 
   useEffect(() => {
-    fetchConvocatorias();
-    fetchCurrentUser();
+    // Fetch user first, then convocatorias in parallel
+    const initializePanel = async () => {
+      try {
+        const userPromise = fetchCurrentUser();
+        const convoPromise = fetchConvocatorias();
+        await Promise.all([userPromise, convoPromise]);
+      } finally {
+        setInitializing(false);
+      }
+    };
+    initializePanel();
   }, []);
 
   useEffect(() => {
@@ -551,6 +561,17 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   };
 
   const isSuperAdmin = currentUserEmail === 'convocatorias@admin.com' || currentUserEmail === 'karen.rodriguez@innpulsacolombia.com';
+
+  if (initializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#CC0C2E]"></div>
+          <p className="text-gray-600">Cargando panel de administración...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -23,15 +23,26 @@ function App() {
   const [isOfertaMenuOpen, setIsOfertaMenuOpen] = useState(false);
   const [closeTimer, setCloseTimer] = useState<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState(true);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    fetchConvocatorias();
-    checkAuth();
+    const initialize = async () => {
+      await checkAuth();
+      if (!isAuthenticated) {
+        await fetchConvocatorias();
+      }
+    };
+    initialize();
   }, []);
 
   async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
-    setIsAuthenticated(!!session);
+    setCheckingAuth(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    } finally {
+      setCheckingAuth(false);
+    }
   }
 
   function handleLoginSuccess() {
@@ -105,6 +116,17 @@ function App() {
     setFilteredConvocatorias(filtered);
   }
 
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#CC0C2E]"></div>
+          <p className="text-gray-600">Verificando sesión...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isAuthenticated) {
     return <AdminPanel onLogout={handleLogout} />;
