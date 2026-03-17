@@ -115,7 +115,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       setConfirmationModal({
         show: true,
         type: 'error',
-        message: 'Por favor ingresa email y contraseña'
+        message: 'Por favor ingresa usuario y contraseña'
       });
       return;
     }
@@ -123,6 +123,9 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
     setCreatingUser(true);
 
     try {
+      // Convertir el usuario a formato de email para Supabase
+      const emailFormat = newUserEmail.includes('@') ? newUserEmail : `${newUserEmail}@admin.com`;
+
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-admin-users`,
         {
@@ -132,7 +135,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
-            users: [{ email: newUserEmail, password: newUserPassword }],
+            users: [{ email: emailFormat, password: newUserPassword }],
             adminKey: 'innpulsa2026'
           }),
         }
@@ -1089,15 +1092,15 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
                   <form onSubmit={handleCreateUser} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email *
+                        Usuario *
                       </label>
                       <input
-                        type="email"
+                        type="text"
                         required
                         value={newUserEmail}
                         onChange={(e) => setNewUserEmail(e.target.value)}
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CC0C2E] focus:border-transparent"
-                        placeholder="usuario@innpulsa.com"
+                        placeholder="usuario"
                       />
                     </div>
 
