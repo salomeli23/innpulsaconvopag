@@ -69,33 +69,32 @@ Deno.serve(async (req: Request) => {
         results.push({
           email: email || 'unknown',
           success: false,
-          error: 'Email and password are required'
+          message: 'Email and password are required'
         });
         continue;
       }
 
-      // Add domain if not present
-      if (!email.includes('@')) {
-        email = `${email}@innpulsacolombia.com`;
-      }
+      // Always add @innpulsacolombia.com domain
+      const fullEmail = `${email}@innpulsacolombia.com`;
 
       // Create new user directly, let Supabase handle duplicate checks
       const { data, error } = await supabaseAdmin.auth.admin.createUser({
-        email: email,
+        email: fullEmail,
         password: password,
         email_confirm: true,
       });
 
       if (error) {
         results.push({
-          email,
+          email: fullEmail,
           success: false,
-          error: error.message
+          message: error.message
         });
       } else {
         results.push({
-          email,
+          email: fullEmail,
           success: true,
+          message: 'Usuario creado exitosamente',
           user_id: data.user?.id
         });
       }
