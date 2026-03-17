@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Convocatoria, ConvocatoriaTerm } from '../types';
-import { Plus, CreditCard as Edit, Trash2, X, Upload, File, Eye, EyeOff, Users, FileSpreadsheet, Database } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, X, Upload, File, Eye, EyeOff, Users, FileSpreadsheet, Database, LogOut } from 'lucide-react';
 import { exportToExcel, exportToSQL } from '../utils/exportUtils';
 
 interface AdminPanelProps {
@@ -24,6 +24,7 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
   const [creatingUser, setCreatingUser] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [confirmationModal, setConfirmationModal] = useState<{
     show: boolean;
     type: 'success' | 'error';
@@ -566,9 +567,10 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
             )}
           </div>
           <button
-            onClick={onLogout}
-            className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
+            onClick={() => setShowLogoutConfirm(true)}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-[#CC0C2E] rounded-lg hover:bg-[#A00A25] transition-colors"
           >
+            <LogOut size={16} />
             Cerrar Sesión
           </button>
         </div>
@@ -1236,6 +1238,44 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
               >
                 Cerrar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-2xl">
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-yellow-100">
+                <LogOut className="w-8 h-8 text-yellow-600" />
+              </div>
+
+              <h3 className="text-xl font-bold mb-2 text-gray-900">
+                Confirmar Cierre de Sesión
+              </h3>
+
+              <p className="text-gray-700 text-center mb-6">
+                ¿Estás seguro de que deseas cerrar sesión?
+              </p>
+
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 px-6 py-2.5 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLogoutConfirm(false);
+                    onLogout();
+                  }}
+                  className="flex-1 px-6 py-2.5 bg-[#CC0C2E] text-white font-medium rounded-lg hover:bg-[#A00A25] transition-colors"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
             </div>
           </div>
         </div>
