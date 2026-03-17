@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Convocatoria, ConvocatoriaTerm } from '../types';
-import { Plus, CreditCard as Edit, Trash2, X, Upload, File, Eye, EyeOff, Users, FileSpreadsheet, Database, LogOut, ArrowLeft } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, X, Upload, File, Eye, EyeOff, Users, FileSpreadsheet, Database, LogOut } from 'lucide-react';
 import { exportToExcel, exportToSQL } from '../utils/exportUtils';
 
 interface AdminPanelProps {
   onLogout: () => void;
-  onBack?: () => void;
 }
 
 interface AdminUser {
@@ -16,7 +15,7 @@ interface AdminUser {
   last_sign_in_at: string | null;
 }
 
-export default function AdminPanel({ onLogout, onBack }: AdminPanelProps) {
+export default function AdminPanel({ onLogout }: AdminPanelProps) {
   const [convocatorias, setConvocatorias] = useState<Convocatoria[]>([]);
   const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'convocatorias' | 'users'>('convocatorias');
@@ -59,13 +58,12 @@ export default function AdminPanel({ onLogout, onBack }: AdminPanelProps) {
   });
 
   useEffect(() => {
-    // Fetch user and convocatorias in parallel for faster loading
+    // Fetch user first, then convocatorias in parallel
     const initializePanel = async () => {
       try {
-        await Promise.all([
-          fetchCurrentUser(),
-          fetchConvocatorias()
-        ]);
+        const userPromise = fetchCurrentUser();
+        const convoPromise = fetchConvocatorias();
+        await Promise.all([userPromise, convoPromise]);
       } finally {
         setInitializing(false);
       }
@@ -280,14 +278,26 @@ export default function AdminPanel({ onLogout, onBack }: AdminPanelProps) {
     setLoadingConvocatorias(true);
 
     try {
+      // Fetch the data immediately without waiting for auto-close
       const { data, error } = await supabase
         .from('convocatorias')
-        .select('*')
+        .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries_count, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching convocatorias:', error);
-        setLoadingConvocatorias(false);
+        // Retry once after 1 second if failed
+        setTimeout(async () => {
+          const { data: retryData } = await supabase
+            .from('convocatorias')
+            .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries_count, created_at, updated_at')
+            .order('created_at', { ascending: false });
+
+          if (retryData) {
+            setConvocatorias(retryData);
+          }
+          setLoadingConvocatorias(false);
+        }, 1000);
         return;
       }
 
@@ -563,15 +573,6 @@ export default function AdminPanel({ onLogout, onBack }: AdminPanelProps) {
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            {onBack && (
-              <button
-                onClick={onBack}
-                className="text-gray-600 hover:text-gray-900 transition-colors p-2 hover:bg-gray-100 rounded-lg"
-                aria-label="Volver"
-              >
-                <ArrowLeft size={24} />
-              </button>
-            )}
             <h1 className="text-2xl font-bold text-gray-900">Panel de Administración</h1>
             {isSuperAdmin && (
               <div className="flex gap-2 border-l border-gray-300 pl-4">

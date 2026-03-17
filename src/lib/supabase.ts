@@ -12,15 +12,5 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,
-    storageKey: 'innpulsa-auth',
-    storage: window.localStorage,
-  },
-  global: {
-    headers: {
-      'x-client-info': 'innpulsa-web',
-    },
-  },
-  db: {
-    schema: 'public',
   },
 });
