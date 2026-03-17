@@ -9,7 +9,7 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,8 +22,11 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
     setError(null);
 
     try {
+      // Convertir el usuario a formato de email para Supabase
+      const emailFormat = username.includes('@') ? username : `${username}@admin.com`;
+
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: emailFormat,
         password,
       });
 
@@ -59,17 +62,17 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Correo Electrónico
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              Usuario
             </label>
             <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-600"
-              placeholder="correo@ejemplo.com"
+              placeholder="usuario"
             />
           </div>
 
