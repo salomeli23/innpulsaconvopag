@@ -126,10 +126,10 @@
                     data.results.forEach(result => {
                         if (result.success) {
                             successCount++;
-                            html += `<div class="user-result user-success">✓ ${result.email} - Creado exitosamente</div>`;
+                            html += `<div class="user-result user-success">✓ Usuario: ${result.email} - Creado exitosamente</div>`;
                         } else {
                             errorCount++;
-                            html += `<div class="user-result user-error">✗ ${result.email} - Error: ${result.error}</div>`;
+                            html += `<div class="user-result user-error">✗ Usuario: ${result.email} - Error: ${result.error}</div>`;
                         }
                     });
 
