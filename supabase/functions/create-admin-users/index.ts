@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
     const results = [];
 
     for (const userData of users) {
-      const { email, password } = userData;
+      let { email, password } = userData;
 
       if (!email || !password) {
         results.push({
@@ -72,6 +72,11 @@ Deno.serve(async (req: Request) => {
           error: 'Email and password are required'
         });
         continue;
+      }
+
+      // Add domain if not present
+      if (!email.includes('@')) {
+        email = `${email}@innpulsacolombia.com`;
       }
 
       // Create new user directly, let Supabase handle duplicate checks
