@@ -1,6 +1,8 @@
 import { Convocatoria } from '../types';
 import { CountdownTimer } from './CountdownTimer';
 import { ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 interface ConvocatoriaCardProps {
   convocatoria: Convocatoria;
@@ -8,7 +10,32 @@ interface ConvocatoriaCardProps {
 }
 
 export function ConvocatoriaCard({ convocatoria, onClick }: ConvocatoriaCardProps) {
-  const isGradient = convocatoria.image_url.startsWith('/gradient-');
+  const [imageUrl, setImageUrl] = useState<string>('/gradient-blue');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadImage() {
+      try {
+        const { data, error } = await supabase
+          .from('convocatorias')
+          .select('image_url')
+          .eq('id', convocatoria.id)
+          .single();
+
+        if (!error && data?.image_url) {
+          setImageUrl(data.image_url);
+        }
+      } catch (err) {
+        console.error('Error loading image:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadImage();
+  }, [convocatoria.id]);
+
+  const isGradient = imageUrl.startsWith('/gradient-');
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col">
@@ -22,11 +49,19 @@ export function ConvocatoriaCard({ convocatoria, onClick }: ConvocatoriaCardProp
             </div>
           </div>
         ) : (
-          <img
-            src={convocatoria.image_url}
-            alt={convocatoria.title}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          <>
+            {loading && (
+              <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+                <div className="text-gray-400">Cargando...</div>
+              </div>
+            )}
+            <img
+              src={imageUrl}
+              alt={convocatoria.title}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity ${loading ? 'opacity-0' : 'opacity-100'}`}
+              onLoad={() => setLoading(false)}
+            />
+          </>
         )}
         <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
           <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-bold capitalize ${

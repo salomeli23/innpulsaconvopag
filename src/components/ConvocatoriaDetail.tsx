@@ -11,10 +11,31 @@ interface ConvocatoriaDetailProps {
 export default function ConvocatoriaDetail({ convocatoria, onBack }: ConvocatoriaDetailProps) {
   const [terms, setTerms] = useState<ConvocatoriaTerm[]>([]);
   const [loadingTerms, setLoadingTerms] = useState(true);
+  const [imageUrl, setImageUrl] = useState<string>('/gradient-blue');
+  const [loadingImage, setLoadingImage] = useState(true);
 
   useEffect(() => {
     fetchTerms();
+    fetchImage();
   }, [convocatoria.id]);
+
+  async function fetchImage() {
+    try {
+      const { data, error } = await supabase
+        .from('convocatorias')
+        .select('image_url')
+        .eq('id', convocatoria.id)
+        .single();
+
+      if (!error && data?.image_url) {
+        setImageUrl(data.image_url);
+      }
+    } catch (err) {
+      console.error('Error loading image:', err);
+    } finally {
+      setLoadingImage(false);
+    }
+  }
 
   async function fetchTerms() {
     try {
@@ -77,11 +98,17 @@ export default function ConvocatoriaDetail({ convocatoria, onBack }: Convocatori
 
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
             <div className="lg:w-[45%]">
-              <img
-                src={convocatoria.image_url}
-                alt={convocatoria.title}
-                className="w-full rounded"
-              />
+              {loadingImage ? (
+                <div className="w-full aspect-video bg-gray-200 animate-pulse rounded flex items-center justify-center">
+                  <span className="text-gray-400">Cargando imagen...</span>
+                </div>
+              ) : (
+                <img
+                  src={imageUrl}
+                  alt={convocatoria.title}
+                  className="w-full rounded"
+                />
+              )}
             </div>
 
             <div className="lg:w-[55%] space-y-6">

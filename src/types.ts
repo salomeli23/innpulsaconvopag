@@ -13,7 +13,7 @@ export interface Convocatoria {
   id: string;
   title: string;
   description: string;
-  image_url: string;
+  image_url?: string;
   status: 'abierta' | 'cerrada';
   start_date: string;
   end_date: string;
