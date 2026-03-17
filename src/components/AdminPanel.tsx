@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Convocatoria, ConvocatoriaTerm } from '../types';
-import { Plus, CreditCard as Edit, Trash2, X, Upload, File, Eye, EyeOff, Users } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, X, Upload, File, Eye, EyeOff, Users, FileSpreadsheet, Database } from 'lucide-react';
+import { exportToExcel, exportToSQL } from '../utils/exportUtils';
 
 interface AdminPanelProps {
   onLogout: () => void;
@@ -573,13 +574,29 @@ export default function AdminPanel({ onLogout }: AdminPanelProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'convocatorias' && (
           <>
-            <div className="mb-6">
+            <div className="mb-6 flex gap-3">
               <button
                 onClick={() => setShowForm(true)}
                 className="flex items-center gap-2 px-6 py-3 bg-[#CC0C2E] text-white rounded-lg hover:bg-[#A00A25] transition-colors"
               >
                 <Plus size={20} />
                 Nueva Convocatoria
+              </button>
+              <button
+                onClick={() => exportToExcel(convocatorias)}
+                className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                title="Exportar a Excel (CSV)"
+              >
+                <FileSpreadsheet size={20} />
+                Exportar Excel
+              </button>
+              <button
+                onClick={() => exportToSQL(convocatorias)}
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                title="Exportar a SQL"
+              >
+                <Database size={20} />
+                Exportar SQL
               </button>
             </div>
 
