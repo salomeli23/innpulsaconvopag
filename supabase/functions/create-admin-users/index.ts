@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
     const results = [];
 
     for (const userData of users) {
-      let { email, password } = userData;
+      const { email, password } = userData;
 
       if (!email || !password) {
         results.push({
@@ -74,25 +74,22 @@ Deno.serve(async (req: Request) => {
         continue;
       }
 
-      // Always add @innpulsacolombia.com domain
-      const fullEmail = `${email}@innpulsacolombia.com`;
-
       // Create new user directly, let Supabase handle duplicate checks
       const { data, error } = await supabaseAdmin.auth.admin.createUser({
-        email: fullEmail,
+        email: email,
         password: password,
         email_confirm: true,
       });
 
       if (error) {
         results.push({
-          email: fullEmail,
+          email: email,
           success: false,
           message: error.message
         });
       } else {
         results.push({
-          email: fullEmail,
+          email: email,
           success: true,
           message: 'Usuario creado exitosamente',
           user_id: data.user?.id
