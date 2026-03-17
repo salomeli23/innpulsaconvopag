@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Usuarios en Lote</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #CC0C2E;
+        }
+        button {
+            background-color: #CC0C2E;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #A00A25;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .user-result {
+            padding: 5px;
+            margin: 5px 0;
+            border-left: 3px solid #ccc;
+            padding-left: 10px;
+        }
+        .user-success {
+            border-left-color: #28a745;
+        }
+        .user-error {
+            border-left-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>Crear Usuarios en Lote</h1>
+    <p>Este script creará todos los usuarios de InnPulsa con sus contraseñas.</p>
+
+    <button id="createButton" onclick="createUsers()">Crear Usuarios</button>
+
+    <div id="result"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://xpuiytzblbodqdaoxiet.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwdWl5dHpibGJvZHFkYW94aWV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDg3MTcwMTgsImV4cCI6MjAyNDI5MzAxOH0.qM7hI-1-3Q4Z5Z0Z5Z0Z5Z0Z5Z0Z5Z0Z5Z0Z5Z0Z5Z0';
+
+        const users = [
+            { email: 'jesus.morales@innpulsacolombia.com', password: 'InnPulsa2026!Morales' },
+            { email: 'cpalaciosala@gmail.com', password: 'InnPulsa2026!Palacios' },
+            { email: 'oscar.uribe@innpulsacolombia.com', password: 'InnPulsa2026!Ou' },
+            { email: 'cindy.villarraga@innpulsacolombia.com', password: 'InnPulsa2026!Villa' },
+            { email: 'diana.diaz@innpulsacolombia.com', password: 'InnPulsa2026!Diaz' },
+            { email: 'giovanny.serrano@innpulsacolombia.com', password: 'InnPulsa2026!Serrano' },
+            { email: 'jhony.ruiz@innpulsacolombia.com', password: 'InnPulsa2026!Ruiz' },
+            { email: 'julian.rocha@innpulsacolombia.com', password: 'InnPulsa2026!Rocha' },
+            { email: 'juan.sandoval@innpulsacolombia.com', password: 'InnPulsa2026!Sandoval' },
+            { email: 'karen.rodriguez@innpulsacolombia.com', password: 'InnPulsa2026!KRodriguez' },
+            { email: 'karol.chaparro@innpulsacolombia.com', password: 'InnPulsa2026!Chaparro' },
+            { email: 'linam.gomez@innpulsacolombia.com', password: 'InnPulsa2026!Gomez' },
+            { email: 'leonardo.perez@innpulsacolombia.com', password: 'InnPulsa2026!Perez' },
+            { email: 'marlon.castro@innpulsacolombia.com', password: 'InnPulsa2026!Castro' },
+            { email: 'ruben.gantiva@innpulsacolombia.com', password: 'InnPulsa2026!Gantiva' },
+            { email: 'richar.rodriguez@innpulsacolombia.com', password: 'InnPulsa2026!RRodriguez' }
+        ];
+
+        async function createUsers() {
+            const button = document.getElementById('createButton');
+            const resultDiv = document.getElementById('result');
+
+            button.disabled = true;
+            resultDiv.className = 'loading';
+            resultDiv.innerHTML = '<p>Creando usuarios...</p>';
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/functions/v1/create-admin-users`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        },
+                        body: JSON.stringify({
+                            users: users,
+                            adminKey: 'innpulsa2026'
+                        }),
+                    }
+                );
+
+                const data = await response.json();
+
+                if (data.results) {
+                    let html = '<h3>Resultados:</h3>';
+                    let successCount = 0;
+                    let errorCount = 0;
+
+                    data.results.forEach(result => {
+                        if (result.success) {
+                            successCount++;
+                            html += `<div class="user-result user-success">✓ ${result.email} - Creado exitosamente</div>`;
+                        } else {
+                            errorCount++;
+                            html += `<div class="user-result user-error">✗ ${result.email} - Error: ${result.error}</div>`;
+                        }
+                    });
+
+                    html = `<p><strong>Total: ${users.length} usuarios | Exitosos: ${successCount} | Errores: ${errorCount}</strong></p>` + html;
+
+                    if (errorCount === 0) {
+                        resultDiv.className = 'success';
+                    } else {
+                        resultDiv.className = 'error';
+                    }
+                    resultDiv.innerHTML = html;
+                } else if (data.error) {
+                    resultDiv.className = 'error';
+                    resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+                } else {
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML = '<p>¡Todos los usuarios fueron creados exitosamente!</p>';
+                }
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `<p>Error al crear usuarios: ${error.message}</p>`;
+            } finally {
+                button.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
