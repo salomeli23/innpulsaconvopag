@@ -34,12 +34,8 @@ export function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps)
 
       // Success - notify parent components
       onLoginSuccess();
-
-      // Small delay to ensure state updates propagate
-      setTimeout(() => {
-        onClose();
-        setLoading(false);
-      }, 100);
+      onClose();
+      setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
       setLoading(false);

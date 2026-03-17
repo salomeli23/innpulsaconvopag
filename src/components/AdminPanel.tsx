@@ -59,12 +59,13 @@ export default function AdminPanel({ onLogout, onBack }: AdminPanelProps) {
   });
 
   useEffect(() => {
-    // Fetch user first, then convocatorias in parallel
+    // Fetch user and convocatorias in parallel for faster loading
     const initializePanel = async () => {
       try {
-        const userPromise = fetchCurrentUser();
-        const convoPromise = fetchConvocatorias();
-        await Promise.all([userPromise, convoPromise]);
+        await Promise.all([
+          fetchCurrentUser(),
+          fetchConvocatorias()
+        ]);
       } finally {
         setInitializing(false);
       }
@@ -279,26 +280,14 @@ export default function AdminPanel({ onLogout, onBack }: AdminPanelProps) {
     setLoadingConvocatorias(true);
 
     try {
-      // Fetch the data immediately without waiting for auto-close
       const { data, error } = await supabase
         .from('convocatorias')
-        .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries_count, created_at, updated_at')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching convocatorias:', error);
-        // Retry once after 1 second if failed
-        setTimeout(async () => {
-          const { data: retryData } = await supabase
-            .from('convocatorias')
-            .select('id, title, description, image_url, start_date, end_date, no_end_date, status, is_active, beneficiaries_count, created_at, updated_at')
-            .order('created_at', { ascending: false });
-
-          if (retryData) {
-            setConvocatorias(retryData);
-          }
-          setLoadingConvocatorias(false);
-        }, 1000);
+        setLoadingConvocatorias(false);
         return;
       }
 

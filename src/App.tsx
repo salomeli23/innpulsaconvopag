@@ -49,6 +49,8 @@ function App() {
   function handleLoginSuccess() {
     setIsAuthenticated(true);
     setIsLoginModalOpen(false);
+    // Automatically show admin panel after login
+    setShowAdminPanel(true);
   }
 
   async function handleLogout() {
