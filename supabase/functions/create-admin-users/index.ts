@@ -74,20 +74,7 @@ Deno.serve(async (req: Request) => {
         continue;
       }
 
-      // Check if user already exists
-      const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-      const existingUser = existingUsers?.users.find(u => u.email === email);
-
-      if (existingUser) {
-        results.push({
-          email,
-          success: false,
-          error: 'User already exists'
-        });
-        continue;
-      }
-
-      // Create new user
+      // Create new user directly, let Supabase handle duplicate checks
       const { data, error } = await supabaseAdmin.auth.admin.createUser({
         email: email,
         password: password,
