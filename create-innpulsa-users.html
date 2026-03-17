@@ -119,7 +119,10 @@
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ users })
+                    body: JSON.stringify({
+                        users,
+                        adminKey: 'innpulsa2026'
+                    })
                 });
 
                 if (!response.ok) {
